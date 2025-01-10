@@ -36,8 +36,6 @@ typedef enum width_and_accuracy_type {
   star = '*'
 } WidthAndAccuracyType_t;
 
-// typedef enum accuracy { accuracy_number, accuracy_star } Accuracy_t;
-
 typedef enum length {
   //мб и нинад
   no_length,
@@ -66,21 +64,6 @@ typedef struct formatted_token {
   int token_position;
 } FormattedToken_t;
 
-// typedef struct digit_token {
-//   char token_string[256];
-//   char token_value[256];
-//   TokenFormat_t digit_format;
-//   int token_size;
-//   int token_position;
-// } DigitToken_t;
-
-// typedef struct string_token {
-//   char token_string[256];
-//   TokenFormat_t string format;
-//   int token_size;
-//   int token_position;
-// } StringToken_t;
-
 typedef struct text_token {
   char token_string[256];
   char token_value[256];
@@ -89,8 +72,6 @@ typedef struct text_token {
 } TextToken_t;
 
 typedef union generic_token {
-  //   DigitToken_t digit_token;
-  //   StringToken_t string_token;
   FormattedToken_t formatted_token;
   TextToken_t text_token;
 } Generic_Token_t;
@@ -116,11 +97,4 @@ void build_text_token(const char *format_string,
 void build_specified_token(const char *format_string,
                            TokenIndicesAndType_t *token_metrics,
                            FormattedToken_t *specified_token);
-// void build_digit_token(const char *format_string,
-//                        TokenIndicesAndType_t *token_metrics,
-//                        FormattedToken_t *digit_token);
-// void build_string_token(const char *format_string,
-//                         TokenIndicesAndType_t *token_metrics,
-//                         FormattedToken_t *string_token);
-
 #endif
