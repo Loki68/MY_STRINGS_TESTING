@@ -116,11 +116,11 @@ void build_text_token(const char *format_string,
 void build_specified_token(const char *format_string,
                            TokenIndicesAndType_t *token_metrics,
                            FormattedToken_t *specified_token);
-void build_digit_token(const char *format_string,
-                       TokenIndicesAndType_t *token_metrics,
-                       FormattedToken_t *digit_token);
-void build_string_token(const char *format_string,
-                        TokenIndicesAndType_t *token_metrics,
-                        FormattedToken_t *string_token);
+// void build_digit_token(const char *format_string,
+//                        TokenIndicesAndType_t *token_metrics,
+//                        FormattedToken_t *digit_token);
+// void build_string_token(const char *format_string,
+//                         TokenIndicesAndType_t *token_metrics,
+//                         FormattedToken_t *string_token);
 
 #endif

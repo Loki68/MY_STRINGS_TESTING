@@ -134,74 +134,75 @@ void build_specified_token(const char *format_string,
   //         s21_strncpy(digit_token->token_value,digit_token->token_string,token_length);
 }
 
-void build_digit_token(const char *format_string,
-                       TokenIndicesAndType_t *token_metrics,
-                       FormattedToken_t *digit_token) {
-  int token_length = 0;
-  int current_char = 0;
-  Flags_t *flags = S21_NULL;
+// void build_digit_token(const char *format_string,
+//                        TokenIndicesAndType_t *token_metrics,
+//                        FormattedToken_t *digit_token) {
+//   int token_length = 0;
+//   int current_char = 0;
+//   Flags_t *flags = S21_NULL;
 
-  flags = &digit_token->token_format.token_flags;
+//   flags = &digit_token->token_format.token_flags;
 
-  token_length =
-      token_metrics->token_end_index - token_metrics->token_begin_index;
-  //где то тут должно быть разделение на формат.
-  for (int i = token_metrics->token_begin_index;
-       i < token_metrics->token_end_index; i++) {
-    current_char = format_string[i];
-    switch (current_char) {
-    case minus:
-      flags->minus = 1;
-      flags->no_flags = 0;
-      break;
-    case plus:
-      flags->plus = 1;
-      flags->no_flags = 0;
-      break;
-    case space:
-      flags->space = 1;
-      flags->no_flags = 0;
-      break;
-    case sharp:
-      flags->sharp = 1;
-      flags->no_flags = 0;
-      break;
-    case zero:
-      flags->zero = 1;
-      flags->no_flags = 0;
-      break;
-    }
+//   token_length =
+//       token_metrics->token_end_index - token_metrics->token_begin_index;
+//   //где то тут должно быть разделение на формат.
+//   for (int i = token_metrics->token_begin_index;
+//        i < token_metrics->token_end_index; i++) {
+//     current_char = format_string[i];
+//     switch (current_char) {
+//     case minus:
+//       flags->minus = 1;
+//       flags->no_flags = 0;
+//       break;
+//     case plus:
+//       flags->plus = 1;
+//       flags->no_flags = 0;
+//       break;
+//     case space:
+//       flags->space = 1;
+//       flags->no_flags = 0;
+//       break;
+//     case sharp:
+//       flags->sharp = 1;
+//       flags->no_flags = 0;
+//       break;
+//     case zero:
+//       flags->zero = 1;
+//       flags->no_flags = 0;
+//       break;
+//     }
 
-    digit_token->token_string[i - token_metrics->token_begin_index] =
-        current_char;
-  }
+//     digit_token->token_string[i - token_metrics->token_begin_index] =
+//         current_char;
+//   }
 
-  digit_token->token_string[token_length] = '\0';
-  // token_length++;
-  digit_token->token_size = (s21_size_t)token_length;
+//   digit_token->token_string[token_length] = '\0';
+//   // token_length++;
+//   digit_token->token_size = (s21_size_t)token_length;
 
-  //в отдельную функцию
-  //   if(flags->no_flags && token_length)
-  //         s21_strncpy(digit_token->token_value,digit_token->token_string,token_length);
-}
+//   //в отдельную функцию
+//   //   if(flags->no_flags && token_length)
+//   //
+//   s21_strncpy(digit_token->token_value,digit_token->token_string,token_length);
+// }
 
-void build_string_token(const char *format_string,
-                        TokenIndicesAndType_t *token_metrics,
-                        FormattedToken_t *string_token) {
-  int token_length = 0;
+// void build_string_token(const char *format_string,
+//                         TokenIndicesAndType_t *token_metrics,
+//                         FormattedToken_t *string_token) {
+//   int token_length = 0;
 
-  token_length =
-      token_metrics->token_end_index - token_metrics->token_begin_index;
+//   token_length =
+//       token_metrics->token_end_index - token_metrics->token_begin_index;
 
-  for (int i = token_metrics->token_begin_index;
-       i < token_metrics->token_end_index; i++)
-    string_token->token_string[i - token_metrics->token_begin_index] =
-        format_string[i];
+//   for (int i = token_metrics->token_begin_index;
+//        i < token_metrics->token_end_index; i++)
+//     string_token->token_string[i - token_metrics->token_begin_index] =
+//         format_string[i];
 
-  string_token->token_string[token_length] = '\0';
-  // token_length++;
-  string_token->token_size = (s21_size_t)token_length;
-}
+//   string_token->token_string[token_length] = '\0';
+//   // token_length++;
+//   string_token->token_size = (s21_size_t)token_length;
+// }
 
 void print_lexemmes_throught_format_string(
     TokenIndicesAndType_t *tokens_metrics, int tokens_count,
