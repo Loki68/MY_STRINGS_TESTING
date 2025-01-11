@@ -5,14 +5,14 @@ CFLAGS = -Wall -Wextra -std=c11
 LIBRARY = ../libs
 CLIBS = -L$(LIBRARY) -l:s21_string.a
 
-SOURCE = main.c s21_sprintf.c s21_string_helpers.c
-OBJECTS = main.o s21_sprintf.o s21_string_helpers.o
+SOURCE = main.c s21_sprintf.c s21_string_helpers.c s21_dynamic_memory_helpers.c
+OBJECTS = main.o s21_sprintf.o s21_string_helpers.o s21_dynamic_memory_helpers.o
 
 #all : clean copy_lib build_program
 
 all : clean format build_program
 
-build_program : s21_string_helpers s21_sprintf main
+build_program : s21_dynamic_memory_helpers s21_string_helpers s21_sprintf main
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(PROGRAM) $(CLIBS)
 
 main :
@@ -23,6 +23,9 @@ s21_sprintf :
 
 s21_string_helpers :
 	$(CC) $(CFLAGS) -c s21_string_helpers.c -o s21_string_helpers.o
+
+s21_dynamic_memory_helpers :
+	$(CC) $(CFLAGS) -c s21_dynamic_memory_helpers.c -o s21_dynamic_memory_helpers.o
 
 copy_lib : 
 	cp -rf ../../MY_STRINGS/src/s21_string.a ../../MY_STRINGS/src/s21_string.h ../libs
