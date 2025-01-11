@@ -29,11 +29,11 @@ typedef struct flags {
   int zero;
 } Flags_t;
 
-typedef enum width_and_accuracy_type {
-  no_item,
+typedef enum accuracy_or_width_type {
+  no_width_or_accuracy,
   number,
   star = '*'
-} WidthAndAccuracyType_t;
+} AccuracyOrWidthType_t;
 
 typedef enum length {
   //мб и нинад
@@ -43,22 +43,29 @@ typedef enum length {
   long_float = 'L'
 } Length_t;
 
-typedef struct token_accuracy_and_width {
-  WidthAndAccuracyType_t type;
-  int width_value;
-} TokenAccuracyAndWidth_t;
+typedef struct token_accuracy_or_width {
+  AccuracyOrWidthType_t type;
+  int accuracy_or_width_value;
+} TokenAccuracyOrWidth_t;
 
 typedef struct format_for_token {
-  Flags_t *token_flags;
-  TokenAccuracyAndWidth_t token_width;
-  TokenAccuracyAndWidth_t token_accuracy;
+  Flags_t token_flags;
+  TokenAccuracyOrWidth_t token_width;
+  TokenAccuracyOrWidth_t token_accuracy;
   Length_t token_length;
+  // int is_not_format; //чтобы считать, что у нас текст
 } FormatForToken_t;
 
+// not format and union of this
+//  typedef struct format {
+//    Generic_Token_t generic_token;
+//    int token_type;
+//  } Format_t;
+
 typedef struct formatted_token {
-  char token_string[256];
-  char token_value[256];
-  FormatForToken_t *token_format;
+  char token_string[256]; //позже изменить эту дичь на маллок
+  char token_value[256]; //позже изменить эту дичь на маллок
+  FormatForToken_t token_format;
   TokenType_t token_type;
   int token_size;
   int token_position;
@@ -86,9 +93,12 @@ TokenIndicesAndType_t *
 TokenIndicesAndType_t_create_array(unsigned long elements_count);
 void TokenIndicesAndType_t_delete_array(TokenIndicesAndType_t *tokens_metrics);
 
-FormatForToken_t *FormatForToken_t_create();
-void FormatForToken_t_delete(FormatForToken_t *format_for_token);
+FormattedToken_t *FormattedToken_t_create(unsigned long elements_count);
+void FormattedToken_t_delete(FormattedToken_t *formated_token);
 
-Flags_t *Flags_t_create();
-void Flags_t_delete(Flags_t *flags_for_token);
+// FormatForToken_t *FormatForToken_t_create();
+// void FormatForToken_t_delete(FormatForToken_t *format_for_token);
+
+// Flags_t *Flags_t_create();
+// void Flags_t_delete(Flags_t *flags_for_token);
 #endif

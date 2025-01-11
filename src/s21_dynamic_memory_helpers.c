@@ -20,19 +20,21 @@ void TokenIndicesAndType_t_delete_array(TokenIndicesAndType_t *tokens_metrics) {
   }
 }
 
-FormatForToken_t *FormatForToken_t_create() {
-  FormatForToken_t *format_for_token = NULL;
+FormattedToken_t *FormattedToken_t_create(unsigned long elements_count) {
+  FormattedToken_t *formated_token = NULL;
 
-  format_for_token = (FormatForToken_t *)malloc(sizeof(FormatForToken_t));
+  if (elements_count)
+    formated_token =
+        (FormattedToken_t *)calloc(elements_count, sizeof(FormattedToken_t));
 
-  return format_for_token;
+  return formated_token;
 }
 
-void FormatForToken_t_delete(FormatForToken_t *format_for_token) {
-  if (format_for_token) {
-    free(format_for_token);
+void FormattedToken_t_delete(FormattedToken_t *formated_token) {
+  if (formated_token) {
+    free(formated_token);
 
-    format_for_token = NULL;
+    formated_token = NULL;
   }
 }
 

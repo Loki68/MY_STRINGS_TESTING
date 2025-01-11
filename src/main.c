@@ -20,6 +20,7 @@
 int main(void) {
 
   // char *str = "%050.3s hello\n";works
+  // char *str = "%*050.3s hello\n";not works as should be
   // char *str = "%#.3*s hello\n";
   char *str = "%+- #033.3ds hello\n";
   char buffer[100] = {0};
@@ -29,7 +30,7 @@ int main(void) {
 
   s21_sprintf(
       "hello world from sprintf\n",
-      "hello     %*#13.8500d\n world%*#983.837364s from sprintf\nwoops");
+      "hello     %#1 3.8500d\n world% #983.837364s from %*ssprintf\nwoops");
 
   // char dest[SZ]="Hello world!";
   // char s21_dest[SZ]="Hello world!";
