@@ -40,7 +40,7 @@ typedef struct accuracy_width {
   int no_width_or_accuracy;
   int number;
   int star;
-  int not_width_or_accuracy; //днем
+  // int not_width_or_accuracy; //днем
 } AccuracyOrWidth_t;
 
 typedef enum length {
@@ -60,61 +60,38 @@ typedef struct length_format {
 } LengthFormat_t;
 
 typedef struct token_accuracy_or_width {
-  AccuracyOrWidth_t accuracy_or_width_flags;
+  int no_width_or_accuracy_flag;
+  int number_flag;
+  int star_flag;
+  // AccuracyOrWidth_t accuracy_or_width_flags;
   char accuracy_or_width_value[64];
 } TokenAccuracyOrWidth_t;
 
-typedef struct format_for_token {
-  Flags_t token_flags;
-  TokenAccuracyOrWidth_t token_width;
-  TokenAccuracyOrWidth_t token_accuracy;
-  LengthFormat_t token_length;
-  // int is_not_format; //чтобы считать, что у нас текст
-} FormatForToken_t;
-
-// not format and union of this
-//  typedef struct format {
-//    Generic_Token_t generic_token;
-//    int token_type;
-//  } Format_t;
+// typedef struct format_for_token {
+//   Flags_t token_flags;
+//   TokenAccuracyOrWidth_t token_width;
+//   TokenAccuracyOrWidth_t token_accuracy;
+//   LengthFormat_t token_length;
+//   // int is_not_format; //чтобы считать, что у нас текст
+// } FormatForToken_t;
 
 typedef struct formatted_token {
   char token_string[256]; //позже изменить эту дичь на маллок
   char token_value[256]; //позже изменить эту дичь на маллок
-  FormatForToken_t token_format;
+  Flags_t token_flags;
+  TokenAccuracyOrWidth_t token_width;
+  TokenAccuracyOrWidth_t token_accuracy;
+  LengthFormat_t token_length;
   TokenType_t token_type;
   int token_size;
   int token_position;
 } FormattedToken_t;
 
-// typedef struct text_token {
-//   char token_string[256];
-//   char token_value[256];
-//   int token_size;
-//   int token_position;
-// } TextToken_t;
+// TokenIndicesAndType_t *
+// TokenIndicesAndType_t_create_array(unsigned long elements_count);
+// void TokenIndicesAndType_t_delete_array(TokenIndicesAndType_t
+// *tokens_metrics);
 
-// typedef union generic_token {
-//   FormattedToken_t formatted_token;
-//   TextToken_t text_token;
-// } Generic_Token_t;
-
-// typedef struct token {
-//   Generic_Token_t generic_token;
-//   int token_type;
-// } Token_t;
-
-//работай плоской простыней структур,идиотто)
-TokenIndicesAndType_t *
-TokenIndicesAndType_t_create_array(unsigned long elements_count);
-void TokenIndicesAndType_t_delete_array(TokenIndicesAndType_t *tokens_metrics);
-
-FormattedToken_t *FormattedToken_t_create(unsigned long elements_count);
-void FormattedToken_t_delete(FormattedToken_t *formated_token);
-
-// FormatForToken_t *FormatForToken_t_create();
-// void FormatForToken_t_delete(FormatForToken_t *format_for_token);
-
-// Flags_t *Flags_t_create();
-// void Flags_t_delete(Flags_t *flags_for_token);
+FormattedToken_t *FormattedToken_t_create_array(unsigned long elements_count);
+void FormattedToken_t_delete_array(FormattedToken_t *formated_token);
 #endif

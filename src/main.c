@@ -24,17 +24,35 @@ int main(void) {
   // char *str = "%#.3*s hello\n";
   // char *str = "%+- #*033.3ds hello\n";not works as should be
   // char *str = "%+- #0*33.3ds hello\n";
-  char *str = "%+- #0*.3ds he%+- 0# dllo\n";
+  char *str = "%+- #0*.3llds he%+- 0# dllo\n";
+  char *str_1 = "";
+  char *str_3 = "%klsdskjsdkjsd %la sjdsj";
   char buffer[100] = {0};
   int res = 0;
   res = sprintf(buffer, str, 10, 3);
   printf("result = %d\nstr = %s\n\n", res, buffer);
 
-  s21_sprintf(
-      "hello world from sprintf\n",
+  res = sprintf(buffer, str_1, 10, 3);
+  printf("result = %d\nstr = %s\n\n", res, buffer);
+
+  res = sprintf(buffer, str_3, 10, 3);
+  printf("result = %d\nstr = %s\n\n", res, buffer);
+
+  char *c_string_0 =
       "hello     %#1 3.8500d\n world% #983.837364s from "
       "%*ssprintf%#- *s\nwoops%#+ 3.*d\nnowidth: %+0#- 123 .5d\nwith width = "
-      "%+0#- 123.5s");
+      "%+0#- 123.5s";
+
+  char *c_string_1 =
+      "lexemme 1 - %%flags only : %+-# 0d\nlexemme 2 -%d percents : %%\n";
+
+  char *c_string_2 = "lexemme 1 - flags only : \nlexemme 2 - percents : \n";
+
+  char *c_string_3 = "";
+
+  char *c_string_4 =
+      "lexemme 1 - flags only %d : \nlexe%%mme 2 - percents : \n";
+  s21_sprintf("hello world from sprintf\n", c_string_0);
 
   // char dest[SZ]="Hello world!";
   // char s21_dest[SZ]="Hello world!";

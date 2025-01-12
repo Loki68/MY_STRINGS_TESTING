@@ -14,57 +14,57 @@
 
 int s21_sprintf(char *str, const char *format, ...) {
 
-  TokenIndicesAndType_t *tokens_metrics = NULL;
-  FormattedToken_t *generated_tokens = NULL;
+  // TokenIndicesAndType_t *tokens_metrics = NULL;
+  FormattedToken_t *tokens = NULL;
 
-  s21_size_t tokens_metrics_size = 0;
+  // s21_size_t tokens_metrics_size = 0;
   //считаем точное число токенов, стобы выделить память под массив токенов
   int tokens_count = 0;
 
-  tokens_metrics_size = s21_strlen(format);
-  //в отдельную функцию
-  tokens_metrics = TokenIndicesAndType_t_create_array(tokens_metrics_size);
+  // проверить сначала строку на пустоту
+  // и действовать под этим условием
+  if (format)
+    tokens_count = get_percent_count(format);
 
-  if (!tokens_metrics)
-    exit(1);
-  // end в отдельную функцию
+  printf("source = %s\nresult = %d\n", format, tokens_count);
 
-  //чтобы компилятор не ругался
-  // format = "hello     %d\n world%s from sprintf\n";
-  printf("Buffer string is %p\nSource string is \"%s\"", str, format);
+  tokens = FormattedToken_t_create_array(tokens_count);
 
-  preparse_string_to_lexemmes(tokens_metrics, &tokens_count, format);
-  // print_lexemmes_throught_format_string(tokens_metrics, tokens_count,
-  // format);
+  if (tokens) {
+    parse_string(format, tokens_count, tokens);
 
-  generated_tokens = FormattedToken_t_create(tokens_count);
+    print_generated_tokens(tokens, tokens_count);
 
-  if (!generated_tokens)
-    exit(1);
-
-  for (int i = 0; i < tokens_count; i++) {
-    switch (tokens_metrics[i].token_type) {
-    case text:
-      generated_tokens[i].token_type = text;
-      generated_tokens[i].token_position = i + 1;
-      build_text_token(format, &tokens_metrics[i], &generated_tokens[i]);
-      break;
-    case integer:
-      generated_tokens[i].token_type = integer;
-      generated_tokens[i].token_position = i + 1;
-      build_specified_token(format, &tokens_metrics[i], &generated_tokens[i]);
-      break;
-    case string:
-      generated_tokens[i].token_type = string;
-      generated_tokens[i].token_position = i + 1;
-      build_specified_token(format, &tokens_metrics[i], &generated_tokens[i]);
-      break;
-    }
+    FormattedToken_t_delete_array(tokens);
+    tokens = NULL;
   }
 
-  print_generated_tokens(generated_tokens, tokens_count);
+  // if (tokens_metrics_size) {
+  //   //в отдельную функцию
+  //   tokens_metrics = TokenIndicesAndType_t_create_array(tokens_metrics_size);
 
-  TokenIndicesAndType_t_delete_array(tokens_metrics);
-  FormattedToken_t_delete(generated_tokens);
+  //   if (tokens_metrics) {
+
+  //     preparse_string_to_lexemmes(tokens_metrics, &tokens_count, format,
+  //                                 tokens_metrics_size);
+  //     print_lexemmes_throught_format_string(tokens_metrics, tokens_count,
+  //                                           format);
+
+  //     generated_tokens = FormattedToken_t_create_array(tokens_count);
+
+  //     if (generated_tokens) {
+  //       parse_lexemmes_to_tokens(format, tokens_metrics, tokens_count,
+  //                                generated_tokens);
+  //       FormattedToken_t_delete_array(generated_tokens);
+  //       generated_tokens = NULL;
+  //     }
+
+  //     // print_generated_tokens(generated_tokens, tokens_count);
+
+  //     TokenIndicesAndType_t_delete_array(tokens_metrics);
+  //     tokens_metrics = NULL;
+  //   }
+  // }
+
   return 0;
 }
