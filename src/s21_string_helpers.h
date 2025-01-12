@@ -6,13 +6,10 @@
 
 #include <stdio.h> //похже удалить
 
-//собственно состояния парсинга формата возле спецификаторов
-typedef enum format_parsing_states {
-  parse_flags,
-  parse_width,
-  parse_accuracy,
-  parse_length
-} FormatParsingStates_t;
+typedef enum accuracy_or_with_flag {
+  accuracy_flag,
+  width_flag
+} AccuracyOrWidthFlag_t;
 
 //позже удалить
 void print_lexemmes_throught_format_string(
@@ -32,8 +29,9 @@ void build_specified_token(const char *format_string,
                            TokenIndicesAndType_t *token_metrics,
                            FormattedToken_t *specified_token);
 void parse_token_character_to_flag(FormattedToken_t *token,
-                                   int *current_start_index, int token_length);
-int parse_token_character_to_width(TokenAccuracyOrWidth_t *token_width,
-                                   int current_character);
+                                   int *current_start_index);
+void parse_token_character_to_accuracy_or_width(
+    FormattedToken_t *token, int *current_start_index,
+    AccuracyOrWidthFlag_t is_accuracy_or_width);
 
 #endif

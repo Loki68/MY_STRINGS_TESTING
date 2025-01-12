@@ -35,6 +35,12 @@ typedef enum accuracy_or_width_type {
   star = '*'
 } AccuracyOrWidthType_t;
 
+typedef struct accuracy_width {
+  int no_width_or_accuracy;
+  int number;
+  int star;
+} AccuracyOrWidth_t;
+
 typedef enum length {
   //мб и нинад
   no_length,
@@ -44,8 +50,8 @@ typedef enum length {
 } Length_t;
 
 typedef struct token_accuracy_or_width {
-  AccuracyOrWidthType_t type;
-  int accuracy_or_width_value;
+  AccuracyOrWidth_t accuracy_or_width_flags;
+  char accuracy_or_width_value[64];
 } TokenAccuracyOrWidth_t;
 
 typedef struct format_for_token {

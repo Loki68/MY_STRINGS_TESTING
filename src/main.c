@@ -22,15 +22,18 @@ int main(void) {
   // char *str = "%050.3s hello\n";works
   // char *str = "%*050.3s hello\n";not works as should be
   // char *str = "%#.3*s hello\n";
-  char *str = "%+- #033.3ds hello\n";
+  // char *str = "%+- #*033.3ds hello\n";not works as should be
+  // char *str = "%+- #0*33.3ds hello\n";
+  char *str = "%+- #0*.3ds he%+- 0# dllo\n";
   char buffer[100] = {0};
   int res = 0;
-  res = sprintf(buffer, str, 3);
+  res = sprintf(buffer, str, 10, 3);
   printf("result = %d\nstr = %s\n\n", res, buffer);
 
   s21_sprintf(
       "hello world from sprintf\n",
-      "hello     %#1 3.8500d\n world% #983.837364s from %*ssprintf\nwoops");
+      "hello     %#1 3.8500d\n world% #983.837364s from "
+      "%*ssprintf\nwoops\nnowidth: %+0#- 123 .5d\nwith width = %+0#- 123.5s");
 
   // char dest[SZ]="Hello world!";
   // char s21_dest[SZ]="Hello world!";

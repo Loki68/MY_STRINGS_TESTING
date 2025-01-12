@@ -76,89 +76,37 @@ void build_text_token(const char *format_string,
 void build_specified_token(const char *format_string,
                            TokenIndicesAndType_t *token_metrics,
                            FormattedToken_t *specified_token) {
-  // Flags_t *flags = S21_NULL;
-  TokenAccuracyOrWidth_t *width = S21_NULL;
-  TokenAccuracyOrWidth_t *accuracy = S21_NULL;
+  // // Flags_t *flags = S21_NULL;
+  // TokenAccuracyOrWidth_t *width = S21_NULL;
+  // TokenAccuracyOrWidth_t *accuracy = S21_NULL;
   int token_length = 0;
-  // int is_flag_parsing = 0;
-  // int is_width_parsing = 0;
-  int is_accuracy_parsing_started = 0;
-  FormatParsingStates_t parsing_state = parse_flags;
-  // int is_length_parsing = 0;
-
-  int current_char = 0;
-  int parsing_result = 0;
-
-  // flags = &specified_token->token_format.token_flags;
-  // flags->no_flags = 1;
-  width = &specified_token->token_format.token_width;
-  width->type = no_width_or_accuracy;
-  width->accuracy_or_width_value = -1;
+  int current_index = 0;
 
   token_length =
       token_metrics->token_end_index - token_metrics->token_begin_index;
   //где то тут должно быть разделение на формат.
-  if (flags && token_length)
+  if (token_length)
     for (int i = token_metrics->token_begin_index;
          i < token_metrics->token_end_index; i++) {
       specified_token->token_string[i - token_metrics->token_begin_index] =
           format_string[i];
-      // current_char = format_string[i];
-      // if (i == token_metrics->token_begin_index)
-      //   switch (parsing_state) {
-      //   case parse_flags:
-      //     if (parse_token_character_to_flag(flags, current_char))
-      //       parsing_state = parse_width;
-      //     else
-      //       break;
-      //   case parse_width:
-      //     if (parse_token_character_to_width(width, current_char))
-      //       parsing_state = parse_accuracy;
-      //     else
-      //       break;
-      //   case parse_accuracy:
-      //     break;
-      //   case parse_length:
-      //     break;
-      //   }
-
-      // // if (i == token_metrics->token_begin_index)
-      // //   is_flag_parsing = 1;
-
-      // // if (is_flag_parsing && !parsing_result)
-      // //   parsing_result = parse_token_character_to_flag(flags,
-      // current_char);
-      // // else if (is_flag_parsing && parsing_result) {
-      // //   is_flag_parsing = 0;
-      // //   is_width_parsing = 1;
-      // //   parsing_result = 0;
-      // // }
-
-      // // if (is_width_parsing && !parsing_result)
-      // //   parsing_result = parse_token_character_to_accuracy(width,
-      // //   current_char);
-      // // else if (is_width_parsing && parsing_result) {
-      // //   is_width_parsing = 0;
-      // //   is_accuracy_parsing=1;
-      // //   parsing_result = 0;
-      // // }
-
-      // // // if (is_accuracy_parsing && !parsing_result)
-      // // //   parsing_result = parse_token_character_to_width(width,
-      // // current_char);
-      // // // else if (is_accuracy_parsing && parsing_result) {
-      // // //   is_accuracy_parsing = 0;
-      // // //   is_length_parsing=1;
-      // // //   parsing_result = 0;
-      // // // }
-
-      specified_token->token_string[i - token_metrics->token_begin_index] =
-          current_char;
     }
 
   specified_token->token_string[token_length] = '\0';
   // token_length++;
-  specified_token->token_size = (s21_size_t)token_length;
+  specified_token->token_size = token_length;
+
+  //выделить отдельную функцию инициализации флагов, ширины и точности
+  parse_token_character_to_flag(specified_token, &current_index);
+  parse_token_character_to_accuracy_or_width(specified_token, &current_index,
+                                             width_flag);
+
+  if (specified_token->token_string[current_index] == '.') {
+    printf("\nthis is point\n");
+    current_index++;
+    parse_token_character_to_accuracy_or_width(specified_token, &current_index,
+                                               accuracy_flag);
+  }
 
   // //мб добавить флаги типа формат установлен или нет
   // token->is_format_installed=1/0;
@@ -170,13 +118,16 @@ void build_specified_token(const char *format_string,
 }
 
 void parse_token_character_to_flag(FormattedToken_t *token,
-                                   int *current_start_index, int token_length) {
-  Flags_t *flags = S21_NULL;
+                                   int *current_start_index) {
+  Flags_t *token_flags = S21_NULL;
   int continue_parsing = 1;
-  int current_character = 0;
+  int token_length = 0;
+  // int current_character = 0;
 
-  flags = &specified_token->token_format.token_flags;
-  flags->no_flags = 1;
+  token_flags = &token->token_format.token_flags;
+  token_flags->no_flags = 1;
+
+  token_length = token->token_size;
 
   for (int index = *current_start_index;
        index < token_length && continue_parsing; index++)
@@ -209,22 +160,71 @@ void parse_token_character_to_flag(FormattedToken_t *token,
       }
 }
 
-int parse_token_character_to_width(TokenAccuracyOrWidth_t *token_width,
-                                   int current_character) {
-  int result = 0;
-  //вот тут будут проблемы и надо покурить механику,что главнее и как работает
-  //звезда и число вместе
-  if (token_width)
-    if (current_character == star) //{
-      token_width->type = star;
+void parse_token_character_to_accuracy_or_width(
+    FormattedToken_t *token, int *current_start_index,
+    AccuracyOrWidthFlag_t is_accuracy_or_width) {
+  TokenAccuracyOrWidth_t *token_accuracy_or_width = S21_NULL;
+  int continue_parsing = 1;
+  int token_length = 0;
+  int current_character = 0;
+  int index = 0;
 
-    else if (current_character > 47 && current_character < 58) {
-      token_width->type = number;
-      token_width->accuracy_or_width_value = 0;
-    } else
-      result = -1;
+  if (is_accuracy_or_width == accuracy_flag)
+    token_accuracy_or_width = &token->token_format.token_accuracy;
+  else
+    token_accuracy_or_width = &token->token_format.token_width;
 
-  return result;
+  token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy = 1;
+
+  token_length = token->token_size;
+  //звезда и число вместе дают не формат
+  for (index = *current_start_index; index < token_length && continue_parsing;
+       index++) {
+    current_character = token->token_string[index];
+
+    switch (current_character) {
+    case star:
+      token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy = 0;
+      token_accuracy_or_width->accuracy_or_width_flags.star = 1;
+      break;
+    default:
+      if (current_character < 48 || current_character > 57) {
+        continue_parsing = 0;
+      } else {
+        token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy =
+            0;
+        token_accuracy_or_width->accuracy_or_width_flags.number = 1;
+        token_accuracy_or_width
+            ->accuracy_or_width_value[index - *current_start_index] =
+            current_character;
+      }
+      break;
+    }
+  }
+
+  token_accuracy_or_width
+      ->accuracy_or_width_value[index - *current_start_index] = '\0';
+  index--;
+
+  // if (token->token_string[index] != '\0' && token->token_string[index] != '.'
+  // &&
+  //     is_accuracy_or_width == width_flag)
+  if (token->token_string[index] != '.' && is_accuracy_or_width == width_flag) {
+    token_accuracy_or_width->accuracy_or_width_flags.star = 0;
+    token_accuracy_or_width->accuracy_or_width_flags.number = 0;
+    token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy = 1;
+    token_accuracy_or_width->accuracy_or_width_value[0] = '\0';
+  }
+
+  if (token_accuracy_or_width->accuracy_or_width_flags.star &&
+      token_accuracy_or_width->accuracy_or_width_flags.number) {
+    token_accuracy_or_width->accuracy_or_width_flags.star = 0;
+    token_accuracy_or_width->accuracy_or_width_flags.number = 0;
+    token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy = 1;
+    token_accuracy_or_width->accuracy_or_width_value[0] = '\0';
+  }
+
+  *current_start_index = index;
 }
 
 void print_lexemmes_throught_format_string(
@@ -234,6 +234,8 @@ void print_lexemmes_throught_format_string(
   printf("Tokens count = %d items\n\n", tokens_count);
 
   for (int j = 0; j < tokens_count; j++) {
+    printf("-------------------------------------------------------------------"
+           "\n");
     switch (tokens_metrics[j].token_type) {
     case text:
       printf("\tToken type : text\n");
@@ -256,13 +258,16 @@ void print_lexemmes_throught_format_string(
          k <= tokens_metrics[j].token_end_index && format_string[k]; k++)
       putchar(format_string[k]);
 
-    printf("\"\n\n");
+    printf("\"\n---------------------------------------------------------------"
+           "---\n\n");
   }
 }
 
 void print_generated_tokens(FormattedToken_t *tokens, int tokens_count) {
   printf("\nGenerated tokens:\n");
   for (int i = 0; i < tokens_count; i++) {
+    printf("-------------------------------------------------------------------"
+           "\n");
     switch (tokens[i].token_type) {
     case text:
       printf("\tToken type : text\n\tToken size = %d\n\tToken position = "
@@ -286,19 +291,30 @@ void print_generated_tokens(FormattedToken_t *tokens, int tokens_count) {
              tokens[i].token_format.token_flags.sharp,
              tokens[i].token_format.token_flags.zero);
       printf("\tToken width:\n");
-      switch (tokens[i].token_format.token_width.type) {
-      case no_width_or_accuracy:
-        printf("\t\tType is No width\n");
-        break;
-      case number:
-        printf("\t\tType is Number\n");
-        break;
-      case star:
-        printf("\t\tType is *\n");
-        break;
-      }
-      printf("\t\tValue is %d",
+
+      printf("\t\tNo width = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
+             tokens[i]
+                 .token_format.token_width.accuracy_or_width_flags
+                 .no_width_or_accuracy,
+             tokens[i].token_format.token_width.accuracy_or_width_flags.number,
+             tokens[i].token_format.token_width.accuracy_or_width_flags.star);
+
+      printf("\t\tValue is %s\n",
              tokens[i].token_format.token_width.accuracy_or_width_value);
+
+      printf("\tToken accuracy:\n");
+
+      printf(
+          "\t\tNo accuracy = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
+          tokens[i]
+              .token_format.token_accuracy.accuracy_or_width_flags
+              .no_width_or_accuracy,
+          tokens[i].token_format.token_accuracy.accuracy_or_width_flags.number,
+          tokens[i].token_format.token_accuracy.accuracy_or_width_flags.star);
+
+      printf("\t\tValue is %s",
+             tokens[i].token_format.token_accuracy.accuracy_or_width_value);
+
       printf("\n\n");
       break;
     case string:
@@ -317,22 +333,36 @@ void print_generated_tokens(FormattedToken_t *tokens, int tokens_count) {
              tokens[i].token_format.token_flags.sharp,
              tokens[i].token_format.token_flags.zero);
       printf("\tToken width:\n");
-      switch (tokens[i].token_format.token_width.type) {
-      case no_width_or_accuracy:
-        printf("\t\tType is No width\n");
-        break;
-      case number:
-        printf("\t\tType is Number\n");
-        break;
-      case star:
-        printf("\t\tType is *\n");
-        break;
-      }
-      printf("\t\tValue is %d",
+
+      printf("\t\tNo width = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
+             tokens[i]
+                 .token_format.token_width.accuracy_or_width_flags
+                 .no_width_or_accuracy,
+             tokens[i].token_format.token_width.accuracy_or_width_flags.number,
+             tokens[i].token_format.token_width.accuracy_or_width_flags.star);
+
+      printf("\t\tValue is %s\n",
              tokens[i].token_format.token_width.accuracy_or_width_value);
+
+      printf("\tToken accuracy:\n");
+
+      printf(
+          "\t\tNo accuracy = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
+          tokens[i]
+              .token_format.token_accuracy.accuracy_or_width_flags
+              .no_width_or_accuracy,
+          tokens[i].token_format.token_accuracy.accuracy_or_width_flags.number,
+          tokens[i].token_format.token_accuracy.accuracy_or_width_flags.star);
+
+      printf("\t\tValue is %s",
+             tokens[i].token_format.token_accuracy.accuracy_or_width_value);
+
       printf("\n\n");
+
       break;
     }
+    printf("\n---------------------------------------------------------------"
+           "---\n\n");
   }
   printf("\n\n");
 }
