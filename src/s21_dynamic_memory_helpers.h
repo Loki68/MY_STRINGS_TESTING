@@ -27,6 +27,7 @@ typedef struct flags {
   int space;
   int sharp;
   int zero;
+  int not_flags; //днем
 } Flags_t;
 
 typedef enum accuracy_or_width_type {
@@ -39,6 +40,7 @@ typedef struct accuracy_width {
   int no_width_or_accuracy;
   int number;
   int star;
+  int not_width_or_accuracy; //днем
 } AccuracyOrWidth_t;
 
 typedef enum length {
@@ -49,6 +51,14 @@ typedef enum length {
   long_float = 'L'
 } Length_t;
 
+typedef struct length_format {
+  int no_length;
+  int short_int_or_unsigned_short;
+  int long_int;
+  int long_float;
+  int not_length;
+} LengthFormat_t;
+
 typedef struct token_accuracy_or_width {
   AccuracyOrWidth_t accuracy_or_width_flags;
   char accuracy_or_width_value[64];
@@ -58,7 +68,7 @@ typedef struct format_for_token {
   Flags_t token_flags;
   TokenAccuracyOrWidth_t token_width;
   TokenAccuracyOrWidth_t token_accuracy;
-  Length_t token_length;
+  LengthFormat_t token_length;
   // int is_not_format; //чтобы считать, что у нас текст
 } FormatForToken_t;
 

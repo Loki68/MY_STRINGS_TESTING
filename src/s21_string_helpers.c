@@ -206,10 +206,10 @@ void parse_token_character_to_accuracy_or_width(
       ->accuracy_or_width_value[index - *current_start_index] = '\0';
   index--;
 
-  // if (token->token_string[index] != '\0' && token->token_string[index] != '.'
-  // &&
-  //     is_accuracy_or_width == width_flag)
-  if (token->token_string[index] != '.' && is_accuracy_or_width == width_flag) {
+  // if (token->token_string[index] != '.' && is_accuracy_or_width ==
+  // width_flag)
+  if (token->token_string[index] != '\0' && token->token_string[index] != '.' &&
+      is_accuracy_or_width == width_flag) {
     token_accuracy_or_width->accuracy_or_width_flags.star = 0;
     token_accuracy_or_width->accuracy_or_width_flags.number = 0;
     token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy = 1;
@@ -225,6 +225,15 @@ void parse_token_character_to_accuracy_or_width(
   }
 
   *current_start_index = index;
+}
+
+int is_a_digit(int character) {
+  int result = 0;
+  return result;
+}
+int is_a_point(int character) {
+  int result = 0;
+  return result;
 }
 
 void print_lexemmes_throught_format_string(

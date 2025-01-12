@@ -34,7 +34,8 @@ int s21_sprintf(char *str, const char *format, ...) {
   printf("Buffer string is %p\nSource string is \"%s\"", str, format);
 
   preparse_string_to_lexemmes(tokens_metrics, &tokens_count, format);
-  print_lexemmes_throught_format_string(tokens_metrics, tokens_count, format);
+  // print_lexemmes_throught_format_string(tokens_metrics, tokens_count,
+  // format);
 
   generated_tokens = FormattedToken_t_create(tokens_count);
 

@@ -34,4 +34,7 @@ void parse_token_character_to_accuracy_or_width(
     FormattedToken_t *token, int *current_start_index,
     AccuracyOrWidthFlag_t is_accuracy_or_width);
 
+int is_a_digit(int character);
+int is_a_point(int character);
+
 #endif

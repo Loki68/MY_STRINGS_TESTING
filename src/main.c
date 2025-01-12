@@ -33,7 +33,8 @@ int main(void) {
   s21_sprintf(
       "hello world from sprintf\n",
       "hello     %#1 3.8500d\n world% #983.837364s from "
-      "%*ssprintf\nwoops\nnowidth: %+0#- 123 .5d\nwith width = %+0#- 123.5s");
+      "%*ssprintf%#- *s\nwoops%#+ 3.*d\nnowidth: %+0#- 123 .5d\nwith width = "
+      "%+0#- 123.5s");
 
   // char dest[SZ]="Hello world!";
   // char s21_dest[SZ]="Hello world!";
