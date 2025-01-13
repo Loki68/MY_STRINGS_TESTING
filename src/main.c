@@ -19,23 +19,23 @@
 
 int main(void) {
 
-  // char *str = "%050.3s hello\n";works
-  // char *str = "%*050.3s hello\n";not works as should be
-  // char *str = "%#.3*s hello\n";
-  // char *str = "%+- #*033.3ds hello\n";not works as should be
-  // char *str = "%+- #0*33.3ds hello\n";
-  char *str = "%+- #0*.3llds he%+- 0# dllo\n";
-  char *str_1 = "";
-  char *str_3 = "%klsdskjsdkjsd %la sjdsj";
+  //   // char *str = "%050.3s hello\n";works
+  //   // char *str = "%*050.3s hello\n";not works as should be
+  //   // char *str = "%#.3*s hello\n";
+  //   // char *str = "%+- #*033.3ds hello\n";not works as should be
+  //   // char *str = "%+- #0*33.3ds hello\n";
+  //   char *str = "%+- #0*.3llds he%+- 0# dllo\n";
+  //   char *str_1 = "";
+  char *str_3 = "%klsdskjsdkjsd %e sjdsj";
   char buffer[100] = {0};
   int res = 0;
-  res = sprintf(buffer, str, 10, 3);
-  printf("result = %d\nstr = %s\n\n", res, buffer);
+  //   res = sprintf(buffer, str, 10, 3);
+  //   printf("result = %d\nstr = %s\n\n", res, buffer);
 
-  res = sprintf(buffer, str_1, 10, 3);
-  printf("result = %d\nstr = %s\n\n", res, buffer);
+  //   res = sprintf(buffer, str_1, 10, 3);
+  //   printf("result = %d\nstr = %s\n\n", res, buffer);
 
-  res = sprintf(buffer, str_3, 10, 3);
+  res = sprintf(buffer, str_3, 10.0 / 3);
   printf("result = %d\nstr = %s\n\n", res, buffer);
 
   char *c_string_0 =
