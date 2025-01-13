@@ -269,8 +269,16 @@ int parse_to_flags(Flags_t *token_flags, char *token_string,
   return index;
 }
 
-void parse_to_width(int current_character) {}
-void parse_to_accuracy(int current_character) {}
+// typedef struct token_accuracy_or_width {
+//   int no_width_or_accuracy_flag;
+//   int number_flag;
+//   int star_flag;
+//   // AccuracyOrWidth_t accuracy_or_width_flags;
+//   char accuracy_or_width_value[64];
+// } TokenAccuracyOrWidth_t;
+
+void parse_to_width(TokenAccuracyOrWidth_t token_width) {}
+void parse_to_accuracy(TokenAccuracyOrWidth_t token_accuracy) {}
 void parse_to_length(int current_character) {}
 void parse_to_spec(int current_character) {}
 

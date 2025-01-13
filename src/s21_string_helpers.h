@@ -36,8 +36,8 @@ void fill_text_token_value(FormattedToken_t *token);
 void parse_single_format_of_token(FormattedToken_t *token);
 int parse_to_flags(Flags_t *token_flags, char *token_string,
                    int current_start_index, int token_size);
-// void parse_to_width(int current_character);
-// void parse_to_accuracy(int current_character);
+void parse_to_width(TokenAccuracyOrWidth_t token_width);
+void parse_to_accuracy(TokenAccuracyOrWidth_t token_accuracy);
 // void parse_to_length(int current_character);
 // void parse_to_spec(int current_character);
 // void preparse_string_to_lexemmes(TokenIndicesAndType_t
