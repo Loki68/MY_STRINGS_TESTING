@@ -84,18 +84,6 @@ int change_tokens_count(FormattedToken_t *last_token, int tokens_count) {
   return result;
 }
 
-// typedef struct formatted_token {
-//   char token_string[256]; //позже изменить эту дичь на маллок
-//   char token_value[256]; //позже изменить эту дичь на маллок
-//   Flags_t token_flags;
-//   TokenAccuracyOrWidth_t token_width;
-//   TokenAccuracyOrWidth_t token_accuracy;
-//   LengthFormat_t token_length;
-//   TokenType_t token_type;
-//   int token_size;
-//   int token_position;
-// } FormattedToken_t;
-
 ParsingState_t parse_to_text(FormattedToken_t *token, const char *format_string,
                              int *returned_index) {
   ParsingState_t returning_state = parsing_text;
@@ -110,6 +98,7 @@ ParsingState_t parse_to_text(FormattedToken_t *token, const char *format_string,
   }
 
   if (size) {
+    token->token_type = text;
     token->token_size = size;
     token->token_string[size] = '\0';
     *returned_index = index;
@@ -136,9 +125,7 @@ ParsingState_t parse_specs_to_text(FormattedToken_t *token,
   int index = 0;
   int size = 1;
   int continue_loop = 1;
-
   index = *returned_index;
-
   token->token_string[index - *returned_index] = format_string[index];
   index++;
 
@@ -146,15 +133,9 @@ ParsingState_t parse_specs_to_text(FormattedToken_t *token,
     for (; format_string[index] && continue_loop; index++)
       switch (format_string[index]) {
       case 'd':
-        // token->token_string[index - *returned_index] = format_string[index];
-        // size++;
-        // returning_state = parsing_text;
         continue_loop = 0;
         break;
       case 's':
-        // token->token_string[index - *returned_index] = format_string[index];
-        // size++;
-        // returning_state = parsing_text;
         continue_loop = 0;
         break;
       default:
@@ -163,18 +144,13 @@ ParsingState_t parse_specs_to_text(FormattedToken_t *token,
         break;
       }
 
-    token->token_string[index - *returned_index - 1] = format_string[index - 1];
-    size++;
-    returning_state = parsing_text;
-  } else {
-
-    token->token_string[index - *returned_index] = format_string[index];
-    size++;
-    returning_state = parsing_text;
-
-    index++;
+    index--;
   }
-  // index++;
+  token->token_string[index - *returned_index] = format_string[index];
+  size++;
+  returning_state = parsing_text;
+
+  index++;
 
   if (size) {
     token->token_size = size;
@@ -187,7 +163,112 @@ ParsingState_t parse_specs_to_text(FormattedToken_t *token,
   return returning_state;
 }
 
-void parse_to_flag(int current_character) {}
+// typedef struct formatted_token {
+//   char token_string[256]; //позже изменить эту дичь на маллок
+//   char token_value[256]; //позже изменить эту дичь на маллок
+//   Flags_t token_flags;
+//   TokenAccuracyOrWidth_t token_width;
+//   TokenAccuracyOrWidth_t token_accuracy;
+//   LengthFormat_t token_length;
+//   TokenType_t token_type;
+//   int token_size;
+//   int token_position;
+// } FormattedToken_t;
+
+void parse_format_of_tokens(FormattedToken_t *tokens, int tokens_count) {
+  for (int i = 0; i < tokens_count; i++)
+    if (tokens[i].token_type != text)
+      parse_single_format_of_token(&tokens[i]);
+    else
+      fill_text_token_value(&tokens[i]);
+}
+
+void parse_single_format_of_token(FormattedToken_t *token) {
+  FormattedToken_t *current_token = NULL;
+  char *string_pointer = NULL;
+  int current_index = 0;
+  current_token = token;
+
+  if (current_token->token_size == 2)
+    try_parse_percents_to_text(current_token);
+
+  if (current_token->token_type == no_type && current_token->token_size) {
+    string_pointer = current_token->token_string + 1;
+
+    current_index = parse_to_flags(&current_token->token_flags, string_pointer,
+                                   current_index, current_token->token_size);
+
+    printf("\ncurrent_index is %d\nstring is %s", current_index,
+           string_pointer);
+  }
+}
+
+void try_parse_percents_to_text(FormattedToken_t *token) {
+  FormattedToken_t *current_token = NULL;
+  current_token = token;
+  if (current_token->token_string[0] == '%' &&
+      current_token->token_string[1] == '%') {
+    current_token->token_type = text;
+    current_token->token_value[0] = '%';
+    current_token->token_value[1] = '\0';
+  }
+}
+
+void fill_text_token_value(FormattedToken_t *token) {
+  FormattedToken_t *current_token = NULL;
+  int current_size = 0;
+  int index = 0;
+
+  current_token = token;
+  printf("\ntext\n");
+  current_size = current_token->token_size;
+
+  if (current_size) {
+    for (; index < current_size; index++)
+      current_token->token_value[index] = current_token->token_string[index];
+
+    current_token->token_value[index] = '\0';
+  }
+}
+
+int parse_to_flags(Flags_t *token_flags, char *token_string,
+                   int current_start_index, int token_size) {
+  int continue_parsing = 1;
+  int index = 0;
+  index = current_start_index;
+
+  for (; index < token_size && continue_parsing; index++)
+    if (token_flags)
+      switch (token_string[index]) {
+      case minus:
+        token_flags->minus = 1;
+        token_flags->no_flags = 0;
+        break;
+      case plus:
+        token_flags->plus = 1;
+        token_flags->no_flags = 0;
+        break;
+      case space:
+        token_flags->space = 1;
+        token_flags->no_flags = 0;
+        break;
+      case sharp:
+        token_flags->sharp = 1;
+        token_flags->no_flags = 0;
+        break;
+      case zero:
+        token_flags->zero = 1;
+        token_flags->no_flags = 0;
+        break;
+      default:
+        continue_parsing = 0;
+        break;
+      }
+
+  printf("\nhello\n");
+  return index;
+}
+
 void parse_to_width(int current_character) {}
 void parse_to_accuracy(int current_character) {}
 void parse_to_length(int current_character) {}
@@ -461,9 +542,9 @@ void print_generated_tokens(FormattedToken_t *tokens, int tokens_count) {
     switch (tokens[i].token_type) {
     case text:
       printf("\tToken type : text\n\tToken size = %d\n\tToken position = "
-             "%d\n\tToken string is : \"%s\"\n\n",
+             "%d\n\tToken string is : \"%s\"\n\tToken value is : \"%s\"\n\n",
              tokens[i].token_size, tokens[i].token_position,
-             tokens[i].token_string);
+             tokens[i].token_string, tokens[i].token_value);
       break;
     case integer:
       printf("\tToken type : integer\n\tToken size = %d\n\tToken position = "
@@ -533,6 +614,41 @@ void print_generated_tokens(FormattedToken_t *tokens, int tokens_count) {
 
       printf("\n\n");
 
+      break;
+
+    case no_type:
+      printf("\tToken type : no typed\n\tToken size = %d\n\tToken position = "
+             "%d\n\tToken string is : \"%s\"\n",
+             tokens[i].token_size, tokens[i].token_position,
+             tokens[i].token_string);
+
+      printf("\tToken flags:\n\t\tis no_flags = %d\n\t\tis minus = %d\n\t\t"
+             "plus = %d\n\t\tspace = %d\n\t\tsharp = %d\n\t\tzero ="
+             "%d\n",
+             tokens[i].token_flags.no_flags, tokens[i].token_flags.minus,
+             tokens[i].token_flags.plus, tokens[i].token_flags.space,
+             tokens[i].token_flags.sharp, tokens[i].token_flags.zero);
+      printf("\tToken width:\n");
+
+      printf("\t\tNo width = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
+             tokens[i].token_width.no_width_or_accuracy_flag,
+             tokens[i].token_width.number_flag,
+             tokens[i].token_width.star_flag);
+
+      printf("\t\tValue is %s\n",
+             tokens[i].token_width.accuracy_or_width_value);
+
+      printf("\tToken accuracy:\n");
+
+      printf("\t\tNo accuracy = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
+             tokens[i].token_accuracy.no_width_or_accuracy_flag,
+             tokens[i].token_accuracy.number_flag,
+             tokens[i].token_accuracy.star_flag);
+
+      printf("\t\tValue is %s",
+             tokens[i].token_accuracy.accuracy_or_width_value);
+
+      printf("\n\n");
       break;
     }
     printf("\n---------------------------------------------------------------"

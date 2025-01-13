@@ -30,7 +30,12 @@ ParsingState_t parse_to_text(FormattedToken_t *token, const char *format_string,
 ParsingState_t parse_specs_to_text(FormattedToken_t *token,
                                    const char *format_string,
                                    int *returned_index);
-// void parse_to_flag(int current_character);
+void parse_format_of_tokens(FormattedToken_t *tokens, int tokens_count);
+void try_parse_percents_to_text(FormattedToken_t *token);
+void fill_text_token_value(FormattedToken_t *token);
+void parse_single_format_of_token(FormattedToken_t *token);
+int parse_to_flags(Flags_t *token_flags, char *token_string,
+                   int current_start_index, int token_size);
 // void parse_to_width(int current_character);
 // void parse_to_accuracy(int current_character);
 // void parse_to_length(int current_character);

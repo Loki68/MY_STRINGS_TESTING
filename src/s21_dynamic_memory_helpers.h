@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-typedef enum type { text, integer, string } TokenType_t;
+typedef enum type { no_type, text, integer, string } TokenType_t;
 
 typedef struct token_indices_and_type {
   int token_begin_index;

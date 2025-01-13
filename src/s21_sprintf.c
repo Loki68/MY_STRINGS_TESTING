@@ -32,6 +32,7 @@ int s21_sprintf(char *str, const char *format, ...) {
 
   if (tokens) {
     parse_string(format, tokens_count, tokens);
+    parse_format_of_tokens(tokens, tokens_count);
 
     print_generated_tokens(tokens, tokens_count);
 
