@@ -176,11 +176,12 @@ ParsingState_t parse_specs_to_text(FormattedToken_t *token,
 // } FormattedToken_t;
 
 void parse_format_of_tokens(FormattedToken_t *tokens, int tokens_count) {
-  for (int i = 0; i < tokens_count; i++)
+  for (int i = 0; i < tokens_count; i++) {
     if (tokens[i].token_type != text)
       parse_single_format_of_token(&tokens[i]);
-    else
+    if (tokens[i].token_type == text)
       fill_text_token_value(&tokens[i]);
+  }
 }
 
 void parse_single_format_of_token(FormattedToken_t *token) {
@@ -568,25 +569,33 @@ void print_generated_tokens(FormattedToken_t *tokens, int tokens_count) {
              tokens[i].token_flags.plus, tokens[i].token_flags.space,
              tokens[i].token_flags.sharp, tokens[i].token_flags.zero);
       printf("\tToken width:\n");
-
-      printf("\t\tNo width = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
-             tokens[i].token_width.no_width_or_accuracy_flag,
-             tokens[i].token_width.number_flag,
-             tokens[i].token_width.star_flag);
-
-      printf("\t\tValue is %s\n",
-             tokens[i].token_width.accuracy_or_width_value);
-
+      switch (tokens[i].token_width.accuracy_or_width_value_type) {
+      case no_width_or_accuracy:
+        printf("\t\tNo width\n");
+        break;
+      case star:
+        printf("\t\tStar = %s\n",
+               tokens[i].token_width.accuracy_or_width_value);
+        break;
+      case number:
+        printf("\t\tNumber = %s\n",
+               tokens[i].token_width.accuracy_or_width_value);
+        break;
+      }
       printf("\tToken accuracy:\n");
-
-      printf("\t\tNo accuracy = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
-             tokens[i].token_accuracy.no_width_or_accuracy_flag,
-             tokens[i].token_accuracy.number_flag,
-             tokens[i].token_accuracy.star_flag);
-
-      printf("\t\tValue is %s",
-             tokens[i].token_accuracy.accuracy_or_width_value);
-
+      switch (tokens[i].token_accuracy.accuracy_or_width_value_type) {
+      case no_width_or_accuracy:
+        printf("\t\tNo accuracy\n");
+        break;
+      case star:
+        printf("\t\tStar = %s\n",
+               tokens[i].token_accuracy.accuracy_or_width_value);
+        break;
+      case number:
+        printf("\t\tNumber = %s\n",
+               tokens[i].token_accuracy.accuracy_or_width_value);
+        break;
+      }
       printf("\n\n");
       break;
     case string:
@@ -602,24 +611,33 @@ void print_generated_tokens(FormattedToken_t *tokens, int tokens_count) {
              tokens[i].token_flags.plus, tokens[i].token_flags.space,
              tokens[i].token_flags.sharp, tokens[i].token_flags.zero);
       printf("\tToken width:\n");
-
-      printf("\t\tNo width = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
-             tokens[i].token_width.no_width_or_accuracy_flag,
-             tokens[i].token_width.number_flag,
-             tokens[i].token_width.star_flag);
-
-      printf("\t\tValue is %s\n",
-             tokens[i].token_width.accuracy_or_width_value);
-
+      switch (tokens[i].token_width.accuracy_or_width_value_type) {
+      case no_width_or_accuracy:
+        printf("\t\tNo width\n");
+        break;
+      case star:
+        printf("\t\tStar = %s\n",
+               tokens[i].token_width.accuracy_or_width_value);
+        break;
+      case number:
+        printf("\t\tNumber = %s\n",
+               tokens[i].token_width.accuracy_or_width_value);
+        break;
+      }
       printf("\tToken accuracy:\n");
-
-      printf("\t\tNo accuracy = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
-             tokens[i].token_accuracy.no_width_or_accuracy_flag,
-             tokens[i].token_accuracy.number_flag,
-             tokens[i].token_accuracy.star_flag);
-
-      printf("\t\tValue is %s",
-             tokens[i].token_accuracy.accuracy_or_width_value);
+      switch (tokens[i].token_accuracy.accuracy_or_width_value_type) {
+      case no_width_or_accuracy:
+        printf("\t\tNo accuracy\n");
+        break;
+      case star:
+        printf("\t\tStar = %s\n",
+               tokens[i].token_accuracy.accuracy_or_width_value);
+        break;
+      case number:
+        printf("\t\tNumber = %s\n",
+               tokens[i].token_accuracy.accuracy_or_width_value);
+        break;
+      }
 
       printf("\n\n");
 
@@ -638,25 +656,33 @@ void print_generated_tokens(FormattedToken_t *tokens, int tokens_count) {
              tokens[i].token_flags.plus, tokens[i].token_flags.space,
              tokens[i].token_flags.sharp, tokens[i].token_flags.zero);
       printf("\tToken width:\n");
-
-      printf("\t\tNo width = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
-             tokens[i].token_width.no_width_or_accuracy_flag,
-             tokens[i].token_width.number_flag,
-             tokens[i].token_width.star_flag);
-
-      printf("\t\tValue is %s\n",
-             tokens[i].token_width.accuracy_or_width_value);
-
+      switch (tokens[i].token_width.accuracy_or_width_value_type) {
+      case no_width_or_accuracy:
+        printf("\t\tNo width\n");
+        break;
+      case star:
+        printf("\t\tStar = %s\n",
+               tokens[i].token_width.accuracy_or_width_value);
+        break;
+      case number:
+        printf("\t\tNumber = %s\n",
+               tokens[i].token_width.accuracy_or_width_value);
+        break;
+      }
       printf("\tToken accuracy:\n");
-
-      printf("\t\tNo accuracy = %d\n\t\tNumber = %d\n\t\tStar = %d\n",
-             tokens[i].token_accuracy.no_width_or_accuracy_flag,
-             tokens[i].token_accuracy.number_flag,
-             tokens[i].token_accuracy.star_flag);
-
-      printf("\t\tValue is %s",
-             tokens[i].token_accuracy.accuracy_or_width_value);
-
+      switch (tokens[i].token_accuracy.accuracy_or_width_value_type) {
+      case no_width_or_accuracy:
+        printf("\t\tNo accuracy\n");
+        break;
+      case star:
+        printf("\t\tStar = %s\n",
+               tokens[i].token_accuracy.accuracy_or_width_value);
+        break;
+      case number:
+        printf("\t\tNumber = %s\n",
+               tokens[i].token_accuracy.accuracy_or_width_value);
+        break;
+      }
       printf("\n\n");
       break;
     }

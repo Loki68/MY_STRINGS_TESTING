@@ -60,9 +60,10 @@ typedef struct length_format {
 } LengthFormat_t;
 
 typedef struct token_accuracy_or_width {
-  int no_width_or_accuracy_flag;
-  int number_flag;
-  int star_flag;
+  AccuracyOrWidthType_t accuracy_or_width_value_type;
+  // int no_width_or_accuracy_flag;
+  // int number_flag;
+  // int star_flag;
   // AccuracyOrWidth_t accuracy_or_width_flags;
   char accuracy_or_width_value[64];
 } TokenAccuracyOrWidth_t;
