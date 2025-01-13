@@ -277,6 +277,7 @@ int parse_to_flags(Flags_t *token_flags, char *token_string,
 //   char accuracy_or_width_value[64];
 // } TokenAccuracyOrWidth_t;
 
+//звездочка и число взаимно исключают друг друга,так что перечисление
 void parse_to_width(TokenAccuracyOrWidth_t token_width) {}
 void parse_to_accuracy(TokenAccuracyOrWidth_t token_accuracy) {}
 void parse_to_length(int current_character) {}

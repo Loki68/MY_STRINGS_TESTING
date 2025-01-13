@@ -26,7 +26,7 @@ int main(void) {
   //   // char *str = "%+- #0*33.3ds hello\n";
   //   char *str = "%+- #0*.3llds he%+- 0# dllo\n";
   //   char *str_1 = "";
-  char *str_3 = "%klsdskjsdkjsd %e sjdsj";
+  char *str_3 = "%klsdskjsdkjsd %.10*e sjdsj%d";
   char buffer[100] = {0};
   int res = 0;
   //   res = sprintf(buffer, str, 10, 3);
