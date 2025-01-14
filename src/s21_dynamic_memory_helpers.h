@@ -27,14 +27,14 @@ typedef struct flags {
   int space;
   int sharp;
   int zero;
-  int not_flags; //днем
+  int flags_length; //днем
 } Flags_t;
 
 typedef enum accuracy_or_width_type {
   no_width_or_accuracy,
   number,
-  star = '*',
-  not_width_or_accuracy
+  star = '*'//,
+  //not_width_or_accuracy
 } AccuracyOrWidthType_t;
 
 // typedef struct accuracy_or_width {
@@ -67,7 +67,7 @@ typedef struct format_string_data {
 
 typedef struct token_accuracy_or_width {
   AccuracyOrWidthType_t value_type;
-  FormatStringData_t number_data;
+  FormatStringData_t accuracy_or_width_data;
 } TokenAccuracyOrWidth_t;
 
 // typedef struct format_for_token {

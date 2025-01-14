@@ -42,11 +42,9 @@ void parse_format_of_tokens(FormattedToken_t *tokens, int tokens_count);
 void try_parse_percents_to_text(FormattedToken_t *token);
 void fill_text_token_value(FormattedToken_t *token);
 void parse_single_format_of_token(FormattedToken_t *token);
-int parse_to_flags(Flags_t *token_flags, char *token_string,
-                   int current_start_index, int token_size);
-int parse_to_width(TokenAccuracyOrWidth_t *token_width, char *token_string,
-                   int current_start_index, int token_size);
-void parse_to_accuracy(TokenAccuracyOrWidth_t *token_accuracy);
+int parse_to_flags(Flags_t *token_flags,FormatStringData_t *format_data, char *format_string);
+int parse_to_width(TokenAccuracyOrWidth_t *token_width, char *format_string, int current_start_index,int current_length);
+void parse_to_accuracy(TokenAccuracyOrWidth_t *token_width, char *format_string, int current_start_index,int current_length);
 // void parse_to_length(int current_character);
 
 // correct

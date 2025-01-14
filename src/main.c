@@ -52,8 +52,13 @@ int main(void) {
 
   char *c_string_4 =
       "lexemme 1 - flags only %d : \nlexe%%mme 2 - percents : \n";
-  s21_sprintf("hello world from sprintf\n", c_string_4);
-
+   s21_sprintf("hello world from sprintf\n", c_string_0);
+  //s21_sprintf("hello world from sprintf\n", c_string_1);
+  //s21_sprintf("hello world from sprintf\n", c_string_2);
+  //s21_sprintf("hello world from sprintf\n", c_string_3);
+  //s21_sprintf("hello world from sprintf\n", c_string_4);
+  //
+  //
   // char dest[SZ]="Hello world!";
   // char s21_dest[SZ]="Hello world!";
   // char str[]="Hello world!";
