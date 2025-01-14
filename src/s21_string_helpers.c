@@ -115,8 +115,11 @@ void initialize_token(FormattedToken_t *new_token, const char *format) {
 
   initialize_length(&new_token->token_length);
 
+  initialize_spec(&new_token->token_spec);
+
   new_token->format_string = (char *)format;
   new_token->token_type = no_type;
+  new_token->is_initialized = 1;
 }
 
 void initialize_string_data(FormatStringData_t *string_data) {
@@ -139,7 +142,7 @@ void initialize_flags(Flags_t *token_flags) {
   current_token_flags->space = 0;
   current_token_flags->sharp = 0;
   current_token_flags->zero = 0;
-  current_token_flags->flags_length=0;
+  current_token_flags->flags_length = 0;
 }
 
 void initialize_accuracy_or_width(
@@ -158,10 +161,23 @@ void initialize_length(LengthFormat_t *token_length) {
 
   current_token_length = token_length;
 
-  current_token_length->no_length = 1;
-  current_token_length->short_int_or_unsigned_short = 0;
-  current_token_length->long_int = 0;
-  current_token_length->long_float = 0;
+  current_token_length->length_type = no_length;
+
+  initialize_string_data(&current_token_length->length_data);
+}
+
+// typedef struct spec_format{
+//   SpecType_t type;
+//   FormatStringData_t spec_format_data;
+// }SpecFormat_t;
+void initialize_spec(SpecFormat_t *token_spec) {
+  SpecFormat_t *current_token_spec = NULL;
+
+  current_token_spec = token_spec;
+
+  current_token_spec->type = no_spec;
+
+  initialize_string_data(&current_token_spec->spec_format_data);
 }
 
 int update_tokens_count(FormattedToken_t *last_token, int tokens_count) {
@@ -219,6 +235,7 @@ ParsingState_t parse_specs_to_text(FormattedToken_t *token,
                                    int *returned_index) {
   FormattedToken_t *current_token = NULL;
   FormatStringData_t *token_format_data = NULL;
+  SpecFormat_t *current_token_spec = NULL;
   char *format_string = NULL;
   ParsingState_t returning_state = parsing_text;
   int index = 0;
@@ -228,23 +245,18 @@ ParsingState_t parse_specs_to_text(FormattedToken_t *token,
 
   current_token = token;
   token_format_data = &token->token_format_string_data;
+  current_token_spec = &token->token_spec;
   format_string = token->format_string;
   token_format_data->data_start_index = *returned_index;
   index++;
 
   if (format_string[index] != '%') {
     for (; format_string[index] && continue_loop; index++)
-      switch (format_string[index]) {
-      case 'd':
+      if (parse_to_spec(current_token_spec, &current_token->token_type,
+                        format_string[index], index))
         continue_loop = 0;
-        break;
-      case 's':
-        continue_loop = 0;
-        break;
-      default:
+      else
         size++;
-        break;
-      }
 
     index--;
   }
@@ -287,21 +299,32 @@ void parse_single_format_of_token(FormattedToken_t *token) {
   if (current_token->token_format_string_data.data_length == 2)
     try_parse_percents_to_text(current_token);
 
-  if (current_token->token_type == no_type &&
+  if (current_token->token_type != text &&
       current_token->token_format_string_data.data_length) {
-    //string_pointer = current_token->format_string + 1;
     string_pointer = current_token->format_string;
 
-    current_index = parse_to_flags(
-        &current_token->token_flags, &current_token->token_format_string_data,string_pointer);
-    //string_pointer = current_token->format_string-1;
+    current_index = parse_to_flags(&current_token->token_flags,
+                                   &current_token->token_format_string_data,
+                                   string_pointer);
 
     current_index = parse_to_width(
-        &current_token->token_width,string_pointer,current_index,current_token->token_format_string_data.data_length);
-//
-//
-//
-//
+        &current_token->token_width, string_pointer, current_index,
+        current_token->token_format_string_data.data_length);
+
+    current_index = parse_to_accuracy(
+        &current_token->token_accuracy, string_pointer, current_index,
+        current_token->token_format_string_data.data_length);
+
+    // current_index = parse_to_length(
+    //         &current_token->token_length, string_pointer, current_index,
+    //         current_token->token_format_string_data.data_length);
+    parse_to_length(&current_token->token_length, string_pointer, current_index,
+                    current_token->token_format_string_data.data_length);
+
+    //
+    //
+    //
+    //
   }
 }
 
@@ -350,322 +373,299 @@ void fill_text_token_value(FormattedToken_t *token) {
   }
 }
 
-
-int parse_to_flags(Flags_t *token_flags,FormatStringData_t *format_data, char *format_string) {
-  Flags_t *current_flags=NULL;
-  char *format=NULL;
+int parse_to_flags(Flags_t *token_flags, FormatStringData_t *format_data,
+                   char *format_string) {
+  Flags_t *current_flags = NULL;
+  char *format = NULL;
 
   int continue_parsing = 1;
   int index = 0;
-  int format_length=0;
-  int flags_length=0;
+  int format_length = 0;
+  int flags_length = 0;
 
-  current_flags=token_flags;
-  format=format_string;
+  current_flags = token_flags;
+  format = format_string;
 
-  index = format_data->data_start_index+1;
-  format_length=index+format_data->data_length;
+  index = format_data->data_start_index + 1;
+  format_length = index + format_data->data_length;
 
   for (; index < format_length && continue_parsing; index++)
-      switch (format[index]) {
-      case minus:
-        current_flags->minus = 1;
-        current_flags->no_flags = 0;
-        flags_length++;
-        break;
-      case plus:
-        current_flags->plus = 1;
-        current_flags->no_flags = 0;
-        flags_length++;
-        break;
-      case space:
-        current_flags->space = 1;
-        current_flags->no_flags = 0;
-        flags_length++;
-        break;
-      case sharp:
-        current_flags->sharp = 1;
-        current_flags->no_flags = 0;
-        flags_length++;
-        break;
-      case zero:
-        current_flags->zero = 1;
-        current_flags->no_flags = 0;
-        flags_length++;
-        break;
-      default:
-        continue_parsing = 0;
-        break;
-      }
+    switch (format[index]) {
+    case minus:
+      current_flags->minus = 1;
+      current_flags->no_flags = 0;
+      flags_length++;
+      break;
+    case plus:
+      current_flags->plus = 1;
+      current_flags->no_flags = 0;
+      flags_length++;
+      break;
+    case space:
+      current_flags->space = 1;
+      current_flags->no_flags = 0;
+      flags_length++;
+      break;
+    case sharp:
+      current_flags->sharp = 1;
+      current_flags->no_flags = 0;
+      flags_length++;
+      break;
+    case zero:
+      current_flags->zero = 1;
+      current_flags->no_flags = 0;
+      flags_length++;
+      break;
+    default:
+      continue_parsing = 0;
+      break;
+    }
 
-//if(flags_length)
-current_flags->flags_length=flags_length;
+  current_flags->flags_length = flags_length;
 
-if(flags_length>=0)
-  index--;
+  if (flags_length >= 0)
+    index--;
 
   return index;
 }
 
-
-// typedef struct token_accuracy_or_width {
-//   AccuracyOrWidthType_t value_type;
-//   FormatStringData_t number_data;
-// } TokenAccuracyOrWidth_t;
-
-// typedef struct format_string_data{
-//   int data_start_index;
-//   int data_length;
-// }FormatStringData_t;
-
-//звездочка и число взаимно исключают друг друга,так что перечисление
-//а вместе-это текст.
-//тут не format_data_string, а current_index
-int parse_to_width(TokenAccuracyOrWidth_t *token_width, char *format_string, int current_start_index,int current_length) {
+int parse_to_width(TokenAccuracyOrWidth_t *token_width, char *format_string,
+                   int current_start_index, int current_length) {
 
   TokenAccuracyOrWidth_t *width_format = NULL;
   char *format = NULL;
   int continue_parsing = 1;
   int index = 0;
   int format_length = 0;
-  // int current_character = 0;
-  
+
   int is_star = 0;
   int is_digit = 0;
 
   width_format = token_width;
   format = format_string;
   index = current_start_index;
-  format_length=index+current_length;
+  format_length = index + current_length;
 
-  for (; index < format_length && continue_parsing;
-       index++){
+  for (; index < format_length && continue_parsing; index++) {
     switch (format[index]) {
-      case '*':
-        is_star = 1;
-        break;
-      default:
-        if (format[index] > 47 && format[index] < 58)
-          is_digit = 1;
-        else
-          continue_parsing = 0;
-        break;
-        
-    }}
-
+    case '*':
+      is_star = 1;
+      break;
+    default:
+      if (format[index] > 47 && format[index] < 58)
+        is_digit = 1;
+      else
+        continue_parsing = 0;
+      break;
+    }
+  }
 
   if (is_star && is_digit)
     width_format->value_type = no_width_or_accuracy;
-  else if(is_star || is_digit) {
+  else if (is_star || is_digit) {
 
-    if(is_star)
+    if (is_star)
       width_format->value_type = star;
-    else 
+    else
       width_format->value_type = number;
-      
-      width_format->accuracy_or_width_data.data_start_index=current_start_index;
-      width_format->accuracy_or_width_data.data_length = index-current_start_index-1;
+
+    width_format->accuracy_or_width_data.data_start_index = current_start_index;
+    width_format->accuracy_or_width_data.data_length =
+        index - current_start_index - 1;
   }
-  // index--;
 
-  // //   TokenAccuracyOrWidth_t *token_accuracy_or_width = NULL;
-  // //   int continue_parsing = 1;
-  // //   int token_length = 0;
-  // //   int current_character = 0;
-  // //   int index = 0;
+  if (width_format->accuracy_or_width_data.data_length > 0)
+    index--;
 
-  // //   if (is_accuracy_or_width == accuracy_flag)
-  // //     token_accuracy_or_width = &token->token_format.token_accuracy;
-  // //   else
-  // //     token_accuracy_or_width = &token->token_format.token_width;
-
-  // //   token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy
-  // =
-  // //   1;
-
-  // //   token_length = token->token_size;
-  // //   //звезда и число вместе дают не формат
-  // // for (index = *current_start_index; index < token_length &&
-  // // continue_parsing;
-  // //      index++) {
-  // //   current_character = token->token_string[index];
-
-  // //   switch (current_character) {
-  // //   case star:
-  // // token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy
-  // //     = 0; token_accuracy_or_width->accuracy_or_width_flags.star = 1;
-  // //     break;
-  // //   default:
-  // //     if (current_character < 48 || current_character > 57) {
-  // //       continue_parsing = 0;
-  // //     } else {
-  // // token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy
-  // //       =
-  // //           0;
-  // //       token_accuracy_or_width->accuracy_or_width_flags.number = 1;
-  // //       token_accuracy_or_width
-  // //           ->accuracy_or_width_value[index - *current_start_index] =
-  // //           current_character;
-  // //     }
-  // //     break;
-  // //   }
-  // // }
-
-  // // token_accuracy_or_width
-  // //     ->accuracy_or_width_value[index - *current_start_index] = '\0';
-  // // index--;
-
-  // //   // if (token->token_string[index] != '.' && is_accuracy_or_width ==
-  // //   // width_flag)
-  // //   if (token->token_string[index] != '\0' && token->token_string[index]
-  // !=
-  // //   '.'
-  // //   &&
-  // //       is_accuracy_or_width == width_flag)
-  // //
-  // init_accuracy_or_width(&token_accuracy_or_width->accuracy_or_width_flags);
-
-  // //   if (token_accuracy_or_width->accuracy_or_width_flags.star &&
-  // //       token_accuracy_or_width->accuracy_or_width_flags.number)
-  // //
-  // init_accuracy_or_width(&token_accuracy_or_width->accuracy_or_width_flags);
-
-  // //   *current_start_index = index;
-
-   return index;
-  //return 0;
+  return index;
 }
 
-void parse_to_accuracy(TokenAccuracyOrWidth_t *token_width, char *format_string, int current_start_index,int current_length) {}
-void parse_to_length(int current_character) {}
-void parse_to_spec(int current_character) {}
+int parse_to_accuracy(TokenAccuracyOrWidth_t *token_accuracy,
+                      char *format_string, int current_start_index,
+                      int current_length) {
+  int index = 0;
 
-// int is_a_point(int character) {
-//   int result = 0;
-//   return result;
-// }
+  index = current_start_index;
 
-// void build_specified_token(const char *format_string,
-//                            TokenIndicesAndType_t *token_metrics,
-//                            FormattedToken_t *specified_token) {
-//   // // Flags_t *flags = S21_NULL;
-//   // TokenAccuracyOrWidth_t *width = S21_NULL;
-//   // TokenAccuracyOrWidth_t *accuracy = S21_NULL;
-//   int token_length = 0;
-//   int current_index = 0;
+  if (format_string[index] == '.') {
+    index++;
+    index =
+        parse_to_width(token_accuracy, format_string, index, current_length);
+  }
 
-//   token_length =
-//       token_metrics->token_end_index - token_metrics->token_begin_index;
-//   //где то тут должно быть разделение на формат.
-//   if (token_length)
-//     for (int i = token_metrics->token_begin_index;
-//          i < token_metrics->token_end_index; i++) {
-//       specified_token->token_string[i - token_metrics->token_begin_index] =
-//           format_string[i];
-//     }
+  return index;
+}
 
-//   specified_token->token_string[token_length] = '\0';
-//   // token_length++;
-//   specified_token->token_size = token_length;
+void parse_to_length(LengthFormat_t *token_length, char *format_string,
+                     int current_start_index, int current_length) {
+  LengthFormat_t *length_format = NULL;
+  char *format = NULL;
+  int continue_parsing = 1;
+  int format_length = 0;
+  int index = 0;
+  int h_count = 0;
+  int l_count = 0;
+  int L_count = 0;
+  int length_length = 0;
 
-//   //выделить отдельную функцию инициализации флагов, ширины и точности
-//   parse_token_character_to_flag(specified_token, &current_index);
-//   parse_token_character_to_accuracy_or_width(specified_token,
-//   &current_index,
-//                                              width_flag);
+  length_format = token_length;
+  format = format_string;
+  index = current_start_index;
+  format_length = index + current_length;
 
-//   if (specified_token->token_string[current_index] == '.') {
-//     current_index++;
-//     parse_token_character_to_accuracy_or_width(specified_token,
-//     &current_index,
-//                                                accuracy_flag);
-//   }
+  // index--;
 
-//   // //мб добавить флаги типа формат установлен или нет
-//   // token->is_format_installed=1/0;
-//   // и обнуление формата
-//   //а дальше вот это:
-//   //в отдельную функцию
-//   //   if(flags->no_flags && token_length)
-//   //
-//   s21_strncpy(digit_token->token_value,digit_token->token_string,token_length);
-// }
+  for (; index < format_length && continue_parsing; index++)
+    switch (format[index]) {
+    case 'h':
+      h_count++;
+      break;
+    case 'l':
+      l_count++;
+      break;
+    case 'L':
+      L_count++;
+      break;
+    default:
+      continue_parsing = 0;
+      break;
+    }
 
-// void parse_token_character_to_accuracy_or_width(
-//     FormattedToken_t *token, int *current_start_index,
-//     AccuracyOrWidthFlag_t is_accuracy_or_width) {
-//   TokenAccuracyOrWidth_t *token_accuracy_or_width = NULL;
-//   int continue_parsing = 1;
-//   int token_length = 0;
-//   int current_character = 0;
-//   int index = 0;
+  length_length = h_count + l_count + L_count;
 
-//   if (is_accuracy_or_width == accuracy_flag)
-//     token_accuracy_or_width = &token->token_format.token_accuracy;
-//   else
-//     token_accuracy_or_width = &token->token_format.token_width;
+  if (length_length && length_length <= 2 && L_count < 2) {
+    if (length_length == h_count)
+      length_format->length_type = short_or_unsigned_short_int_length;
 
-//   token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy =
-//   1;
+    if (length_length == l_count)
+      length_format->length_type = long_int_length;
 
-//   token_length = token->token_size;
-//   //звезда и число вместе дают не формат
-//   for (index = *current_start_index; index < token_length &&
-//   continue_parsing;
-//        index++) {
-//     current_character = token->token_string[index];
+    if (length_length == L_count)
+      length_format->length_type = long_double_length;
+  }
 
-//     switch (current_character) {
-//     case star:
-//       token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy
-//       = 0; token_accuracy_or_width->accuracy_or_width_flags.star = 1;
-//       break;
-//     default:
-//       if (current_character < 48 || current_character > 57) {
-//         continue_parsing = 0;
-//       } else {
-//         token_accuracy_or_width->accuracy_or_width_flags.no_width_or_accuracy
-//         =
-//             0;
-//         token_accuracy_or_width->accuracy_or_width_flags.number = 1;
-//         token_accuracy_or_width
-//             ->accuracy_or_width_value[index - *current_start_index] =
-//             current_character;
-//       }
-//       break;
-//     }
-//   }
+  if (length_format->length_type != no_length && length_length) {
+    length_format->length_data.data_start_index = current_start_index;
+    length_format->length_data.data_length = length_length;
+    // index--;
+  }
+}
 
-//   token_accuracy_or_width
-//       ->accuracy_or_width_value[index - *current_start_index] = '\0';
-//   index--;
+// return bool result
+//  typedef struct format_string_data {
+//    int data_start_index;
+//    int data_length;
+//  } FormatStringData_t;
+int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
+                  char format_character, int current_start_index) {
 
-//   // if (token->token_string[index] != '.' && is_accuracy_or_width ==
-//   // width_flag)
-//   if (token->token_string[index] != '\0' && token->token_string[index] !=
-//   '.'
-//   &&
-//       is_accuracy_or_width == width_flag)
-//     init_accuracy_or_width(&token_accuracy_or_width->accuracy_or_width_flags);
+  SpecFormat_t *current_spec = NULL;
+  int spec = 0;
+  int continue_parsing = 1;
+  int result = 0;
+  int format_length = 0;
 
-//   if (token_accuracy_or_width->accuracy_or_width_flags.star &&
-//       token_accuracy_or_width->accuracy_or_width_flags.number)
-//     init_accuracy_or_width(&token_accuracy_or_width->accuracy_or_width_flags);
+  current_spec = token_spec;
+  spec = format_character;
+  // no_type, text, integer, real, string, single_character
+  switch (spec) {
+  case 'c':
+    result = 1;
+    current_spec->type = c;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = single_character;
+    break;
+  case 'd':
+    result = 1;
+    current_spec->type = d;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = integer;
+    break;
+  case 'f':
+    result = 1;
+    current_spec->type = f;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = real;
+    break;
+  case 's':
+    result = 1;
+    current_spec->type = s;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = real;
+    break;
+  case 'u':
+    result = 1;
+    current_spec->type = u;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = integer;
+    break;
+  case 'g':
+    result = 1;
+    current_spec->type = g;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = real;
+    break;
+  case 'G':
+    result = 1;
+    current_spec->type = G;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = real;
+    break;
+  case 'e':
+    result = 1;
+    current_spec->type = e;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = real;
+    break;
+  case 'E':
+    result = 1;
+    current_spec->type = E;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = real;
+    break;
+  case 'x':
+    result = 1;
+    current_spec->type = x;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = integer;
+    break;
+  case 'X':
+    result = 1;
+    current_spec->type = X;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = integer;
+    break;
+  case 'o':
+    result = 1;
+    current_spec->type = o;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = integer; //??
+    break;
+  case 'p':
+    result = 1;
+    current_spec->type = p;
+    current_spec->spec_format_data.data_start_index = current_start_index;
+    current_spec->spec_format_data.data_length = 1;
+    *token_type = integer;
+    break;
+  }
 
-//   *current_start_index = index;
-// }
+  return result;
+}
 
-// void init_accuracy_or_width(AccuracyOrWidth_t *token_accuracy_or_width) {
-//   if (token_accuracy_or_width) {
-//     token_accuracy_or_width->star = 0;
-//     token_accuracy_or_width->number = 0;
-//     token_accuracy_or_width->no_width_or_accuracy = 1;
-
-//     //заменить на динамику
-//     // token_accuracy_or_width->accuracy_or_width_value[0] = '\0';
-//   }
-// }
-
+//
 void print_generated_tokens(FormattedToken_t *tokens, const char *format,
                             int tokens_count) {
   char *format_string = NULL;
@@ -692,6 +692,12 @@ void print_generated_tokens(FormattedToken_t *tokens, const char *format,
       break;
     }
 
+    printf("\tToken initializing status : ");
+    if (tokens[j].is_initialized)
+      printf("initialized\n");
+    else
+      printf("not initialized\n");
+
     // format_string = tokens[j].format_string;
     printf("\tToken begin index = %d\n\tToken length = %d\n",
            tokens[j].token_format_string_data.data_start_index,
@@ -707,8 +713,6 @@ void print_generated_tokens(FormattedToken_t *tokens, const char *format,
       putchar(format_string[k]);
 
     printf("\"\n\tToken value : \"");
-
-    
 
     if (tokens[j].token_value_string_data.data_start_index >= 0 &&
         tokens[j].token_value_string_data.data_length > 0) {
@@ -733,65 +737,201 @@ void print_generated_tokens(FormattedToken_t *tokens, const char *format,
            tokens[j].token_flags.no_flags, tokens[j].token_flags.minus,
            tokens[j].token_flags.plus, tokens[j].token_flags.space,
            tokens[j].token_flags.sharp, tokens[j].token_flags.zero);
-    
-    printf("\t\tflags_length = %d\n",tokens[j].token_flags.flags_length);
 
-// typedef struct token_accuracy_or_width {
-//   AccuracyOrWidthType_t value_type;
-//   FormatStringData_t accuracy_or_width_data;
-// } TokenAccuracyOrWidth_t;
+    printf("\t\tflags_length = %d\n", tokens[j].token_flags.flags_length);
 
-// typedef struct format_string_data{
-//   int data_start_index;
-//   int data_length;
-// }FormatStringData_t;
+    // typedef struct token_accuracy_or_width {
+    //   AccuracyOrWidthType_t value_type;
+    //   FormatStringData_t accuracy_or_width_data;
+    // } TokenAccuracyOrWidth_t;
 
-// typedef struct formatted_token {
-//   FormatStringData_t token_format_string_data;
-//   FormatStringData_t token_value_string_data;
-//   char token_string[256]; //позже изменить эту дичь на маллок
-//   char token_value[256]; //позже изменить эту дичь на маллок
-//   Flags_t token_flags;
-//   TokenAccuracyOrWidth_t token_width;
-//   TokenAccuracyOrWidth_t token_accuracy;
-//   LengthFormat_t token_length;
-//   char *format_string;
-//   TokenType_t token_type;
-//   // int token_size;
-//   // int token_position;
-// } FormattedToken_t;
-    printf("\tToken width:\n");
-// typedef enum accuracy_or_width_type {
-//   no_width_or_accuracy,
-//   number,
-//   star = '*'//,
-//   //not_width_or_accuracy
-// } AccuracyOrWidthType_t;
-    if(tokens[j].token_width.value_type==no_width_or_accuracy)
-      printf("\t\tNo width\n");
+    // typedef struct format_string_data{
+    //   int data_start_index;
+    //   int data_length;
+    // }FormatStringData_t;
 
-    if(tokens[j].token_width.value_type==star)
-      printf("\t\tStar: ");
+    // typedef enum accuracy_or_width_type {
+    //   no_width_or_accuracy,
+    //   number,
+    //   star = '*'//,
+    //   //not_width_or_accuracy
+    // } AccuracyOrWidthType_t;
 
-    if(tokens[j].token_width.value_type==number)
-      printf("\t\tNumber: ");
+    printf("\tToken width: ");
+    if (tokens[j].token_width.value_type == no_width_or_accuracy)
+      printf("No width\n\t");
+
+    if (tokens[j].token_width.value_type == star)
+      printf("Star\n\t");
+
+    if (tokens[j].token_width.value_type == number)
+      printf("Number\n\t");
 
     if (tokens[j].token_width.accuracy_or_width_data.data_start_index >= 0 &&
         tokens[j].token_width.accuracy_or_width_data.data_length > 0) {
-      begin_index = tokens[j].token_width.accuracy_or_width_data.data_start_index;
-      end_index = tokens[j].token_width.accuracy_or_width_data.data_start_index +
-                  tokens[j].token_width.accuracy_or_width_data.data_length;
+      begin_index =
+          tokens[j].token_width.accuracy_or_width_data.data_start_index;
+      end_index =
+          tokens[j].token_width.accuracy_or_width_data.data_start_index +
+          tokens[j].token_width.accuracy_or_width_data.data_length;
 
-      printf("\"");
+      printf("\tWidth value : \"");
       for (int k = begin_index; k < end_index && format_string[k]; k++)
         putchar(format_string[k]);
-      
-      printf("\"\n");
-      }
-      
 
-    // current_token->token_value_string_data.begin_index = begin_index;
-    // current_token->token_value_string_data.begin_index = 1;
+      printf("\"\n\t");
+    }
+
+    printf("\tWidth start index : %d\n\t\tWidth length: %d\n",
+           tokens[j].token_width.accuracy_or_width_data.data_start_index,
+           tokens[j].token_width.accuracy_or_width_data.data_length);
+
+    printf("\tToken accuracy: ");
+    if (tokens[j].token_accuracy.value_type == no_width_or_accuracy)
+      printf("No accuracy\n\t");
+
+    if (tokens[j].token_accuracy.value_type == star)
+      printf("Star\n\t");
+
+    if (tokens[j].token_accuracy.value_type == number)
+      printf("Number\n\t");
+
+    if (tokens[j].token_accuracy.accuracy_or_width_data.data_start_index >= 0 &&
+        tokens[j].token_accuracy.accuracy_or_width_data.data_length > 0) {
+      begin_index =
+          tokens[j].token_accuracy.accuracy_or_width_data.data_start_index;
+      end_index =
+          tokens[j].token_accuracy.accuracy_or_width_data.data_start_index +
+          tokens[j].token_accuracy.accuracy_or_width_data.data_length;
+
+      printf("\tAccuracy value : \"");
+      for (int k = begin_index; k < end_index && format_string[k]; k++)
+        putchar(format_string[k]);
+
+      printf("\"\n\t");
+    }
+
+    printf("\tAccuracy start index : %d\n\t\tAccuracy length: %d\n",
+           tokens[j].token_accuracy.accuracy_or_width_data.data_start_index,
+           tokens[j].token_accuracy.accuracy_or_width_data.data_length);
+
+    // typedef struct length_format {
+    //   FormatStringData_t length_data;
+    //   Length_t length_type;
+    // } LengthFormat_t;
+    printf("\tToken length : ");
+    switch (tokens[j].token_length.length_type) {
+    case no_length:
+      printf("no length\n\t");
+      break;
+    case short_or_unsigned_short_int_length:
+      printf("short int or unsigned short\n");
+      break;
+    case long_int_length:
+      printf("long int\n");
+      break;
+    case long_double_length:
+      printf("long float\n");
+      break;
+    }
+
+    if (tokens[j].token_length.length_data.data_start_index >= 0 &&
+        tokens[j].token_length.length_data.data_length > 0) {
+      begin_index = tokens[j].token_length.length_data.data_start_index;
+      end_index = tokens[j].token_length.length_data.data_start_index +
+                  tokens[j].token_length.length_data.data_length;
+
+      printf("\tLength value : \"");
+      for (int k = begin_index; k < end_index && format_string[k]; k++)
+        putchar(format_string[k]);
+
+      printf("\"\n\t");
+    }
+
+    printf("\tLength start index : %d\n\t\tLength length: %d\n",
+           tokens[j].token_length.length_data.data_start_index,
+           tokens[j].token_length.length_data.data_length);
+
+    //     typedef struct formatted_token {
+    //   FormatStringData_t token_format_string_data;
+    //   FormatStringData_t token_value_string_data;
+    //   Flags_t token_flags;
+    //   TokenAccuracyOrWidth_t token_width;
+    //   TokenAccuracyOrWidth_t token_accuracy;
+    //   LengthFormat_t token_length;
+    //   SpecFormat_t token_spec;
+    //   char *format_string;
+    //   TokenType_t token_type;
+    //   int is_initialized;
+    // } FormattedToken_t;
+
+    // typedef enum spec_type{
+    // no_spec,
+    //   c='c', d='d', f='f', s='s', u='u',g='g', G='G', e='e', E='E', x='x',
+    //   X='X', o='o', p='p'
+    // }SpecType_t;
+    printf("\tToken spec : ");
+    switch (tokens[j].token_spec.type) {
+    case no_spec:
+      printf("no_spec\n\t");
+      break;
+    case c:
+      printf("c\n\t");
+      break;
+    case d:
+      printf("d\n");
+      break;
+    case f:
+      printf("f\n");
+      break;
+    case s:
+      printf("s\n");
+      break;
+    case u:
+      printf("u\n");
+      break;
+    case g:
+      printf("g\n");
+      break;
+    case G:
+      printf("G\n");
+      break;
+    case e:
+      printf("e\n");
+      break;
+    case E:
+      printf("E\n");
+      break;
+    case x:
+      printf("x\n");
+      break;
+    case X:
+      printf("X\n");
+      break;
+    case o:
+      printf("o\n");
+      break;
+    case p:
+      printf("p\n");
+      break;
+    }
+
+    if (tokens[j].token_spec.spec_format_data.data_start_index >= 0 &&
+        tokens[j].token_spec.spec_format_data.data_length > 0) {
+      begin_index = tokens[j].token_spec.spec_format_data.data_start_index;
+      end_index = tokens[j].token_spec.spec_format_data.data_start_index +
+                  tokens[j].token_spec.spec_format_data.data_length;
+
+      printf("\tSpec value : \"");
+      for (int k = begin_index; k < end_index && format_string[k]; k++)
+        putchar(format_string[k]);
+
+      printf("\"\n\t");
+    }
+
+    printf("\tSpec start index : %d\n\t\tSpec length: %d\n",
+           tokens[j].token_spec.spec_format_data.data_start_index,
+           tokens[j].token_spec.spec_format_data.data_length);
 
     printf("\n---------------------------------------------------------------"
            "---\n\n");

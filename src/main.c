@@ -26,7 +26,7 @@ int main(void) {
   //   // char *str = "%+- #0*33.3ds hello\n";
   //   char *str = "%+- #0*.3llds he%+- 0# dllo\n";
   //   char *str_1 = "";
-  char *str_3 = "%klsdskjsdkjsd %.10*e sjdsj%d";
+  char *str_3 = "%klsdskjsdkjsd %.10e sjdsj%d , %  5d";
   char buffer[100] = {0};
   int res = 0;
   //   res = sprintf(buffer, str, 10, 3);
@@ -35,7 +35,7 @@ int main(void) {
   //   res = sprintf(buffer, str_1, 10, 3);
   //   printf("result = %d\nstr = %s\n\n", res, buffer);
 
-  res = sprintf(buffer, str_3, 10.0 / 3);
+  res = sprintf(buffer, str_3, 10.0 / 3, 1);
   printf("result = %d\nstr = %s\n\n", res, buffer);
 
   char *c_string_0 =
@@ -53,23 +53,29 @@ int main(void) {
   char *c_string_4 =
       "lexemme 1 - flags only %d : \nlexe%%mme 2 - percents : \n";
 
-char *c_string_5 =
-      "lexemme 1 - flags only %d : \nlexe%%mme 2 - percents %#10d: \n%#*d and %#+- 0 *10d";
-   s21_sprintf("hello world from sprintf\n", c_string_5);
-  //s21_sprintf("hello world from sprintf\n", c_string_0);
-  //s21_sprintf("hello world from sprintf\n", c_string_1);
-  //s21_sprintf("hello world from sprintf\n", c_string_2);
-  //s21_sprintf("hello world from sprintf\n", c_string_3);
-  //s21_sprintf("hello world from sprintf\n", c_string_4);
+  char *c_string_7 =
+      "lexemme 1 - flags only %d : \nlexe%#+- 010.*hdmme 2 - percents : \n";
+
+  char *c_string_5 = "lexemme 1 - flags only %hd : \nlexe%%mme 2 - percents "
+                     "%#10d: \n%#*.573d and %#+- 0 *10d";
+
+  char *c_string_6 = "lexemme 1 - flags only %ld :%Ld %hd %lld %LLd %hhd %lLhd "
+                     "%llld %LLLd %hhhd %lhd %Lhd %lLd";
+  s21_sprintf("hello world from sprintf\n", c_string_7);
+  // s21_sprintf("hello world from sprintf\n", c_string_0);
+  // s21_sprintf("hello world from sprintf\n", c_string_1);
+  // s21_sprintf("hello world from sprintf\n", c_string_2);
+  // s21_sprintf("hello world from sprintf\n", c_string_3);
+  // s21_sprintf("hello world from sprintf\n", c_string_4);
   //
   //
-  // char dest[SZ]="Hello world!";
-  // char s21_dest[SZ]="Hello world!";
-  // char str[]="Hello world!";
-  // char str_1[]="Hello world!";
-  // char str_2[]="there is no power as no ";
-  // char str_2_1[]="there is no power as no ";
-  // char* str_3=" byte code";
+  //  char dest[SZ]="Hello world!";
+  //  char s21_dest[SZ]="Hello world!";
+  //  char str[]="Hello world!";
+  //  char str_1[]="Hello world!";
+  //  char str_2[]="there is no power as no ";
+  //  char str_2_1[]="there is no power as no ";
+  //  char* str_3=" byte code";
 
   // char *const_dest="Hello world!";
 

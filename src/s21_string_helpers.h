@@ -31,6 +31,7 @@ void initialize_flags(Flags_t *token_flags);
 void initialize_accuracy_or_width(
     TokenAccuracyOrWidth_t *token_accuracy_or_width);
 void initialize_length(LengthFormat_t *token_length);
+void initialize_spec(SpecFormat_t *token_spec);
 //
 int update_tokens_count(FormattedToken_t *last_token, int tokens_count);
 //
@@ -42,11 +43,17 @@ void parse_format_of_tokens(FormattedToken_t *tokens, int tokens_count);
 void try_parse_percents_to_text(FormattedToken_t *token);
 void fill_text_token_value(FormattedToken_t *token);
 void parse_single_format_of_token(FormattedToken_t *token);
-int parse_to_flags(Flags_t *token_flags,FormatStringData_t *format_data, char *format_string);
-int parse_to_width(TokenAccuracyOrWidth_t *token_width, char *format_string, int current_start_index,int current_length);
-void parse_to_accuracy(TokenAccuracyOrWidth_t *token_width, char *format_string, int current_start_index,int current_length);
-// void parse_to_length(int current_character);
-
+int parse_to_flags(Flags_t *token_flags, FormatStringData_t *format_data,
+                   char *format_string);
+int parse_to_width(TokenAccuracyOrWidth_t *token_width, char *format_string,
+                   int current_start_index, int current_length);
+int parse_to_accuracy(TokenAccuracyOrWidth_t *token_accuracy,
+                      char *format_string, int current_start_index,
+                      int current_length);
+void parse_to_length(LengthFormat_t *token_length, char *format_string,
+                     int current_start_index, int current_length);
+int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
+                  char format_character, int current_start_index);
 // correct
 int get_percent_count(const char *format_string);
 
