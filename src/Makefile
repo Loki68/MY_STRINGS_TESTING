@@ -9,8 +9,8 @@ SOURCE = main.c s21_sprintf.c s21_string_helpers.c s21_dynamic_memory_helpers.c
 OBJECTS = main.o s21_sprintf.o s21_string_helpers.o s21_dynamic_memory_helpers.o
 
 #all : clean copy_lib build_program
-
-all : clean format build_program
+#all : clean format build_program
+all : clean build_program
 
 build_program : s21_dynamic_memory_helpers s21_string_helpers s21_sprintf main
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(PROGRAM) $(CLIBS)
