@@ -1,51 +1,51 @@
 #include "s21_string_helpers.h"
 
-// typedef struct format_string_data{
-//   int data_start_index;
-//   int data_length;
-// }FormatStringData_t;
+// // typedef struct format_string_data{
+// //   int data_start_index;
+// //   int data_length;
+// // }FormatStringData_t;
 
-// typedef struct flags {
-//   int no_flags;
-//   int minus;
-//   int plus;
-//   int space;
-//   int sharp;
-//   int zero;
-//   //int not_flags; //днем
-// } Flags_t;
+// // typedef struct flags {
+// //   int no_flags;
+// //   int minus;
+// //   int plus;
+// //   int space;
+// //   int sharp;
+// //   int zero;
+// //   //int not_flags; //днем
+// // } Flags_t;
 
-// typedef struct formatted_token {
-//   FormatStringData_t token_format_string_data;
-//   FormatStringData_t token_value_string_data;
-//   Flags_t token_flags;
-//   TokenAccuracyOrWidth_t token_width_data;
-//   TokenAccuracyOrWidth_t token_accuracy_data;
-//   LengthFormat_t token_length;
-//   char *format_string;
-//   TokenType_t token_type;
-// } FormattedToken_t;
+// // typedef struct formatted_token {
+// //   FormatStringData_t token_format_string_data;
+// //   FormatStringData_t token_value_string_data;
+// //   Flags_t token_flags;
+// //   TokenAccuracyOrWidth_t token_width_data;
+// //   TokenAccuracyOrWidth_t token_accuracy_data;
+// //   LengthFormat_t token_length;
+// //   char *format_string;
+// //   TokenType_t token_type;
+// // } FormattedToken_t;
 
-// typedef struct token_accuracy_or_width {
-//   AccuracyOrWidthType_t value_type;
-//   FormatStringData_t number_data;
-// } TokenAccuracyOrWidth_t;
+// // typedef struct token_accuracy_or_width {
+// //   AccuracyOrWidthType_t value_type;
+// //   FormatStringData_t number_data;
+// // } TokenAccuracyOrWidth_t;
 
-// typedef enum accuracy_or_width_type {
-//   no_width_or_accuracy,
-//   number,
-//   star = '*',
-//   not_width_or_accuracy
-// } AccuracyOrWidthType_t;
+// // typedef enum accuracy_or_width_type {
+// //   no_width_or_accuracy,
+// //   number,
+// //   star = '*',
+// //   not_width_or_accuracy
+// // } AccuracyOrWidthType_t;
 
-typedef enum parsing_specs_state {
-  parsing_flag,
-  parsing_width,
-  parsing_accuracy,
-  parcing_length,
-  parsing_spec,
-  parsing_specs_end
-} ParsingSpecsState_t;
+// typedef enum parsing_specs_state {
+//   parsing_flag,
+//   parsing_width,
+//   parsing_accuracy,
+//   parcing_length,
+//   parsing_spec,
+//   parsing_specs_end
+// } ParsingSpecsState_t;
 
 int get_percent_count(const char *format_string) {
   int result = 1;
@@ -289,10 +289,12 @@ void parse_single_format_of_token(FormattedToken_t *token) {
 
   if (current_token->token_type == no_type &&
       current_token->token_format_string_data.data_length) {
-    string_pointer = current_token->format_string + 1;
+    //string_pointer = current_token->format_string + 1;
+    string_pointer = current_token->format_string;
 
     current_index = parse_to_flags(
         &current_token->token_flags, &current_token->token_format_string_data,string_pointer);
+    //string_pointer = current_token->format_string-1;
 
     current_index = parse_to_width(
         &current_token->token_width,string_pointer,current_index,current_token->token_format_string_data.data_length);
@@ -300,8 +302,6 @@ void parse_single_format_of_token(FormattedToken_t *token) {
 //
 //
 //
-    // printf("\ncurrent_index is %d\nstring is %s", current_index,
-    //        string_pointer);
   }
 }
 
@@ -363,7 +363,7 @@ int parse_to_flags(Flags_t *token_flags,FormatStringData_t *format_data, char *f
   current_flags=token_flags;
   format=format_string;
 
-  index = format_data->data_start_index;
+  index = format_data->data_start_index+1;
   format_length=index+format_data->data_length;
 
   for (; index < format_length && continue_parsing; index++)
@@ -398,7 +398,11 @@ int parse_to_flags(Flags_t *token_flags,FormatStringData_t *format_data, char *f
         break;
       }
 
+//if(flags_length)
 current_flags->flags_length=flags_length;
+
+if(flags_length>=0)
+  index--;
 
   return index;
 }
@@ -435,30 +439,32 @@ int parse_to_width(TokenAccuracyOrWidth_t *token_width, char *format_string, int
   format_length=index+current_length;
 
   for (; index < format_length && continue_parsing;
-       index++)
+       index++){
     switch (format[index]) {
-    case star:
-      is_star = 1;
-      break;
-    default:
-      if (format[index] > 46 && format[index] < 58)
-        is_digit = 1;
-      else
-        continue_parsing = 0;
-      break;
-    }
+      case '*':
+        is_star = 1;
+        break;
+      default:
+        if (format[index] > 47 && format[index] < 58)
+          is_digit = 1;
+        else
+          continue_parsing = 0;
+        break;
+        
+    }}
+
 
   if (is_star && is_digit)
     width_format->value_type = no_width_or_accuracy;
-  else {
-    if (is_star)
+  else if(is_star || is_digit) {
+
+    if(is_star)
       width_format->value_type = star;
-    else {
+    else 
       width_format->value_type = number;
-      //вот тут непрально
+      
       width_format->accuracy_or_width_data.data_start_index=current_start_index;
-      width_format->accuracy_or_width_data.data_length = index-current_start_index;
-    }
+      width_format->accuracy_or_width_data.data_length = index-current_start_index-1;
   }
   // index--;
 
@@ -780,8 +786,9 @@ void print_generated_tokens(FormattedToken_t *tokens, const char *format,
       for (int k = begin_index; k < end_index && format_string[k]; k++)
         putchar(format_string[k]);
       
-      }
       printf("\"\n");
+      }
+      
 
     // current_token->token_value_string_data.begin_index = begin_index;
     // current_token->token_value_string_data.begin_index = 1;
