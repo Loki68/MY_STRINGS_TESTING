@@ -209,7 +209,13 @@ ParsingState_t parse_specs_to_text(FormattedToken_t *token,
     index--;
   }
 
-  size++;
+//было
+//разберись с процентом в конце строки
+size++;
+
+// //стало
+  // if (format_string[index])
+  //   size++;
 
   returning_state = parsing_text;
 
@@ -431,6 +437,9 @@ int parse_to_accuracy(TokenAccuracyOrWidth_t *token_accuracy,
         parse_to_width(token_accuracy, format_string, index, current_length);
   }
 
+  if(!token_accuracy->accuracy_or_width_data.data_length)
+    index-=1;
+
   return index;
 }
 
@@ -451,7 +460,7 @@ void parse_to_length(LengthFormat_t *token_length, char *format_string,
   index = current_start_index;
   format_length = index + current_length;
 
-  for (; index < format_length && continue_parsing; index++)
+  for (; index < format_length && continue_parsing; index++){
     switch (format[index]) {
     case 'h':
       h_count++;
@@ -465,7 +474,7 @@ void parse_to_length(LengthFormat_t *token_length, char *format_string,
     default:
       continue_parsing = 0;
       break;
-    }
+    }}
 
   length_length = h_count + l_count + L_count;
 
@@ -484,6 +493,8 @@ void parse_to_length(LengthFormat_t *token_length, char *format_string,
     length_format->length_data.data_start_index = current_start_index;
     length_format->length_data.data_length = length_length;
   }
+
+  
 }
 
 int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
@@ -495,102 +506,71 @@ int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
 
   current_spec = token_spec;
   spec = format_character;
-
+  //заменить вызовом на void? set_initial_spec()index,spec_type,&result
   switch (spec) {
   case 'c':
-    result = 1;
-    current_spec->type = c;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,c,current_start_index);
     *token_type = single_character;
     break;
   case 'd':
-    result = 1;
-    current_spec->type = d;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,d,current_start_index);
     *token_type = integer;
     break;
   case 'f':
-    result = 1;
-    current_spec->type = f;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,f,current_start_index);
     *token_type = real;
     break;
   case 's':
-    result = 1;
-    current_spec->type = s;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
-    *token_type = real;
+    set_token_spec_and_set_result(current_spec,&result,s,current_start_index);
+    *token_type = string;
     break;
   case 'u':
-    result = 1;
-    current_spec->type = u;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,u,current_start_index);
     *token_type = integer;
     break;
   case 'g':
-    result = 1;
-    current_spec->type = g;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,g,current_start_index);
     *token_type = real;
     break;
   case 'G':
-    result = 1;
-    current_spec->type = G;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,G,current_start_index);
     *token_type = real;
     break;
   case 'e':
-    result = 1;
-    current_spec->type = e;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,e,current_start_index);
     *token_type = real;
     break;
   case 'E':
-    result = 1;
-    current_spec->type = E;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,E,current_start_index);
     *token_type = real;
     break;
   case 'x':
-    result = 1;
-    current_spec->type = x;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,x,current_start_index);
     *token_type = integer;
     break;
   case 'X':
-    result = 1;
-    current_spec->type = X;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,X,current_start_index);
     *token_type = integer;
     break;
   case 'o':
-    result = 1;
-    current_spec->type = o;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,o,current_start_index);
     *token_type = integer; //??
     break;
   case 'p':
-    result = 1;
-    current_spec->type = p;
-    current_spec->spec_format_data.data_start_index = current_start_index;
-    current_spec->spec_format_data.data_length = 1;
+    set_token_spec_and_set_result(current_spec,&result,p,current_start_index);
     *token_type = integer;
     break;
   }
 
   return result;
+}
+
+void set_token_spec_and_set_result(SpecFormat_t *token_spec,int *result, TokenType_t token_type,int index){
+  
+  *result = 1;
+    token_spec->type = token_type;
+    token_spec->spec_format_data.data_start_index = index;
+    token_spec->spec_format_data.data_length = 1;
 }
 
 void check_token_type(FormattedToken_t *token) {
@@ -602,19 +582,31 @@ void check_token_type(FormattedToken_t *token) {
   current_token = token;
   control_length = token->token_format_string_data.data_length;
 
-  if (current_token->token_accuracy.value_type != no_width_or_accuracy)
-    result_length++;
-
   result_length += current_token->token_spec.spec_format_data.data_length;
   result_length += current_token->token_length.length_data.data_length;
   result_length +=
       current_token->token_accuracy.accuracy_or_width_data.data_length;
+
+  if (current_token->token_accuracy.value_type != no_width_or_accuracy)
+    result_length++;
+
+
   result_length +=
       current_token->token_width.accuracy_or_width_data.data_length;
   result_length += current_token->token_flags.flags_length;
 
   if (result_length != control_length)
     current_token->token_type = text;
+}
+
+int correct_initialized_tokens_count(FormattedToken_t *tokens, int tokens_count){
+  int result=0;
+
+  for(int i=0; i<tokens_count;i++)
+    if(tokens[i].is_initialized)
+      result++;
+
+  return result;
 }
 
 int get_count_of_spec_tokens(FormattedToken_t *tokens, int tokens_count) {
@@ -627,26 +619,91 @@ int get_count_of_spec_tokens(FormattedToken_t *tokens, int tokens_count) {
   return result;
 }
 
-//вот с утра
-void print_format_string_in_buffer(char *buffer_for_printing,
-                                   FormattedToken_t *tokens,
-                                   int spec_tokens_count) {
+void print_text_in_buffer(FormattedToken_t *token,char* buffer_for_printing){
+  char *string=NULL;
+  int current_index=0;
+  int current_length=0;
+  
+  string=token->format_string;
+  current_index=token->token_value_string_data.data_start_index;
+  current_length=token->token_value_string_data.data_length + current_index;
 
-  printf("spec tokens count is %d\n\n",spec_tokens_count);
-  //  va_list arg=NULL;
-  //  int va_args_count = 0;            // указатель на параметр
+  printf("\ntext : ");
 
-  //   va_start(arg, count);   // получение адреса первого вариадического
-  //   параметра
+  for(;current_index<current_length && string[current_index];current_index++)
+    putchar(string[current_index]);
+  
+  putchar('\n');
+  
+  //printf("%s",token->token_value_string_data.data_start_index);
+}
 
-  //   for(int i=0; i < count; ++i) {
-  //               s += va_arg(arg, long);  // получение значение вариадического
-  //               параметра
-  //                                       // и переход к следующему параметру
-  //   }
+void print_integer_in_buffer(FormattedToken_t *token,char* buffer_for_printing){
+  char *string=NULL;
+  int current_index=0;
+  int current_length=0;
+  
+  string=token->format_string;
+  current_index=token->token_format_string_data.data_start_index;
+  current_length=token->token_format_string_data.data_length + current_index;
 
-  //   va_end(arg);               // завершение процедуры перебора вариадических
-  //   параметров
+  printf("\ninteger : ");
+
+  for(;current_index<current_length && string[current_index];current_index++)
+    putchar(string[current_index]);
+
+  putchar('\n');
+}
+
+void print_real_in_buffer(FormattedToken_t *token,char* buffer_for_printing){
+  char *string=NULL;
+  int current_index=0;
+  int current_length=0;
+  
+  string=token->format_string;
+  current_index=token->token_format_string_data.data_start_index;
+  current_length=token->token_format_string_data.data_length + current_index;
+
+  printf("\nreal : ");
+
+  for(;current_index<current_length && string[current_index];current_index++)
+    putchar(string[current_index]);
+
+  putchar('\n');
+}
+
+void print_string_in_buffer(FormattedToken_t *token,char* buffer_for_printing){
+  char *string=NULL;
+  int current_index=0;
+  int current_length=0;
+  
+  string=token->format_string;
+  current_index=token->token_format_string_data.data_start_index;
+  current_length=token->token_format_string_data.data_length + current_index;
+
+  printf("\nstring : ");
+
+  for(;current_index<current_length && string[current_index];current_index++)
+    putchar(string[current_index]);
+
+  putchar('\n');
+}
+
+void print_single_character_in_buffer(FormattedToken_t *token,char* buffer_for_printing){
+  char *string=NULL;
+  int current_index=0;
+  int current_length=0;
+  
+  string=token->format_string;
+  current_index=token->token_format_string_data.data_start_index;
+  current_length=token->token_format_string_data.data_length + current_index;
+
+  printf("\nsingle_character : ");
+
+  for(;current_index<current_length && string[current_index];current_index++)
+    putchar(string[current_index]);
+
+  putchar('\n');
 }
 
 void print_generated_tokens(FormattedToken_t *tokens, const char *format,

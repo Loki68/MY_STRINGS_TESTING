@@ -57,16 +57,20 @@ int main(void) {
                      "percents%#10. 5d : \n";
 
   char *c_string_5 = "lexemme 1 - flags only %hd : \nlexe%%mme 2 - percents "
-                     "%#10d: \n%#*.573d and %#+- 0 *10d";
+                     "%#10d: \n%#*.573ld and %#+- 0 *10d";
 
   char *c_string_6 = "lexemme 1 - flags only %ld :%Ld %hd %lld %LLd %hhd %lLhd "
-                     "%llld %LLLd %hhhd %lhd %Lhd %lLd";
-  s21_sprintf("hello world from sprintf\n", c_string_7);
-  // s21_sprintf("hello world from sprintf\n", c_string_0);
-  // s21_sprintf("hello world from sprintf\n", c_string_1);
-  // s21_sprintf("hello world from sprintf\n", c_string_2);
-  // s21_sprintf("hello world from sprintf\n", c_string_3);
-  // s21_sprintf("hello world from sprintf\n", c_string_4);
+                     "%llld %LLLd %hhhd %lhd %Lhd %lLd%";
+  //s21_sprintf("hello world from sprintf\n", c_string_7);
+  //s21_sprintf("hello world from sprintf\n", c_string_5);
+    
+  s21_sprintf("hello world from sprintf\n", c_string_0);
+  printf("\n\n%s\n",c_string_0);
+   //s21_sprintf("hello world from sprintf\n", c_string_1);
+   //s21_sprintf("hello world from sprintf\n", c_string_2);
+   //s21_sprintf("hello world from sprintf\n", c_string_3);
+   //s21_sprintf("hello world from sprintf\n", c_string_4);
+   //s21_sprintf("hello world from sprintf\n", c_string_6);
   //
   //
   //  char dest[SZ]="Hello world!";
