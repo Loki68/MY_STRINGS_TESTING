@@ -54,6 +54,7 @@ void parse_to_length(LengthFormat_t *token_length, char *format_string,
                      int current_start_index, int current_length);
 int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
                   char format_character, int current_start_index);
+void check_token_type(FormattedToken_t *token);
 // correct
 int get_percent_count(const char *format_string);
 

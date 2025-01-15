@@ -1,52 +1,5 @@
 #include "s21_string_helpers.h"
 
-// // typedef struct format_string_data{
-// //   int data_start_index;
-// //   int data_length;
-// // }FormatStringData_t;
-
-// // typedef struct flags {
-// //   int no_flags;
-// //   int minus;
-// //   int plus;
-// //   int space;
-// //   int sharp;
-// //   int zero;
-// //   //int not_flags; //днем
-// // } Flags_t;
-
-// // typedef struct formatted_token {
-// //   FormatStringData_t token_format_string_data;
-// //   FormatStringData_t token_value_string_data;
-// //   Flags_t token_flags;
-// //   TokenAccuracyOrWidth_t token_width_data;
-// //   TokenAccuracyOrWidth_t token_accuracy_data;
-// //   LengthFormat_t token_length;
-// //   char *format_string;
-// //   TokenType_t token_type;
-// // } FormattedToken_t;
-
-// // typedef struct token_accuracy_or_width {
-// //   AccuracyOrWidthType_t value_type;
-// //   FormatStringData_t number_data;
-// // } TokenAccuracyOrWidth_t;
-
-// // typedef enum accuracy_or_width_type {
-// //   no_width_or_accuracy,
-// //   number,
-// //   star = '*',
-// //   not_width_or_accuracy
-// // } AccuracyOrWidthType_t;
-
-// typedef enum parsing_specs_state {
-//   parsing_flag,
-//   parsing_width,
-//   parsing_accuracy,
-//   parcing_length,
-//   parsing_spec,
-//   parsing_specs_end
-// } ParsingSpecsState_t;
-
 int get_percent_count(const char *format_string) {
   int result = 1;
 
@@ -128,7 +81,7 @@ void initialize_string_data(FormatStringData_t *string_data) {
   current_string_data = string_data;
 
   current_string_data->data_start_index = -1;
-  current_string_data->data_length = -1;
+  current_string_data->data_length = 0;
 }
 
 void initialize_flags(Flags_t *token_flags) {
@@ -166,10 +119,6 @@ void initialize_length(LengthFormat_t *token_length) {
   initialize_string_data(&current_token_length->length_data);
 }
 
-// typedef struct spec_format{
-//   SpecType_t type;
-//   FormatStringData_t spec_format_data;
-// }SpecFormat_t;
 void initialize_spec(SpecFormat_t *token_spec) {
   SpecFormat_t *current_token_spec = NULL;
 
@@ -285,7 +234,7 @@ void parse_format_of_tokens(FormattedToken_t *tokens, int tokens_count) {
       parse_single_format_of_token(&tokens[i]);
 
     if (tokens[i].token_type == text &&
-        tokens[i].token_value_string_data.data_length == -1)
+        !tokens[i].token_value_string_data.data_length)
       fill_text_token_value(&tokens[i]);
   }
 }
@@ -315,16 +264,10 @@ void parse_single_format_of_token(FormattedToken_t *token) {
         &current_token->token_accuracy, string_pointer, current_index,
         current_token->token_format_string_data.data_length);
 
-    // current_index = parse_to_length(
-    //         &current_token->token_length, string_pointer, current_index,
-    //         current_token->token_format_string_data.data_length);
     parse_to_length(&current_token->token_length, string_pointer, current_index,
                     current_token->token_format_string_data.data_length);
 
-    //
-    //
-    //
-    //
+    check_token_type(current_token);
   }
 }
 
@@ -513,8 +456,6 @@ void parse_to_length(LengthFormat_t *token_length, char *format_string,
   index = current_start_index;
   format_length = index + current_length;
 
-  // index--;
-
   for (; index < format_length && continue_parsing; index++)
     switch (format[index]) {
     case 'h':
@@ -547,15 +488,9 @@ void parse_to_length(LengthFormat_t *token_length, char *format_string,
   if (length_format->length_type != no_length && length_length) {
     length_format->length_data.data_start_index = current_start_index;
     length_format->length_data.data_length = length_length;
-    // index--;
   }
 }
 
-// return bool result
-//  typedef struct format_string_data {
-//    int data_start_index;
-//    int data_length;
-//  } FormatStringData_t;
 int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
                   char format_character, int current_start_index) {
 
@@ -663,6 +598,32 @@ int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
   }
 
   return result;
+}
+
+void check_token_type(FormattedToken_t *token) {
+  FormattedToken_t *current_token = NULL;
+  //потому что процент не учитываются
+  int result_length = 1;
+  int control_length = 0;
+
+  current_token = token;
+  control_length = token->token_format_string_data.data_length;
+
+  if (current_token->token_accuracy.value_type != no_width_or_accuracy)
+    result_length++;
+
+  result_length += current_token->token_spec.spec_format_data.data_length;
+  result_length += current_token->token_length.length_data.data_length;
+  result_length +=
+      current_token->token_accuracy.accuracy_or_width_data.data_length;
+  result_length +=
+      current_token->token_width.accuracy_or_width_data.data_length;
+  result_length += current_token->token_flags.flags_length;
+
+  if (result_length != control_length)
+    current_token->token_type = text;
+
+  // result_length++;
 }
 
 //

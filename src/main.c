@@ -53,8 +53,8 @@ int main(void) {
   char *c_string_4 =
       "lexemme 1 - flags only %d : \nlexe%%mme 2 - percents : \n";
 
-  char *c_string_7 =
-      "lexemme 1 - flags only %d : \nlexe%#+- 010.*hdmme 2 - percents : \n";
+  char *c_string_7 = "lexemme 1 - flags only %d : \nlexe%#+- 010.*hdmme 2 - "
+                     "percents%#10. 5d : \n";
 
   char *c_string_5 = "lexemme 1 - flags only %hd : \nlexe%%mme 2 - percents "
                      "%#10d: \n%#*.573d and %#+- 0 *10d";
