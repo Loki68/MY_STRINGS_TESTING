@@ -12,12 +12,6 @@ typedef enum type {
   single_character
 } TokenType_t;
 
-// typedef struct token_indices_and_type {
-//   int token_begin_index;
-//   int token_end_index;
-//   TokenType_t token_type;
-// } TokenIndicesAndType_t;
-
 typedef enum spec_type {
   no_spec,
   c = 'c',
@@ -35,7 +29,6 @@ typedef enum spec_type {
   p = 'p'
 } SpecType_t;
 
-// sprintf flags
 typedef enum flags_enumeration {
   minus = '-',
   plus = '+',
@@ -51,22 +44,14 @@ typedef struct flags {
   int space;
   int sharp;
   int zero;
-  int flags_length; //днем
+  int flags_length;
 } Flags_t;
 
 typedef enum accuracy_or_width_type {
   no_width_or_accuracy,
   number,
-  star = '*' //,
-  // not_width_or_accuracy
+  star = '*'
 } AccuracyOrWidthType_t;
-
-// typedef struct accuracy_or_width {
-//   int no_width_or_accuracy;
-//   int number;
-//   int star;
-//   // int not_width_or_accuracy; //днем
-// } AccuracyOrWidth_t;
 
 typedef struct format_string_data {
   int data_start_index;
@@ -74,7 +59,6 @@ typedef struct format_string_data {
 } FormatStringData_t;
 
 typedef enum length {
-  //мб и нинад
   no_length,
   short_or_unsigned_short_int_length = 'h',
   long_int_length = 'l',

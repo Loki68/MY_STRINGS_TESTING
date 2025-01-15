@@ -17,7 +17,6 @@ void parse_string(const char *format_string, int tokens_length,
                   FormattedToken_t *tokens) {
 
   FormattedToken_t *array_of_tokens = NULL;
-  array_of_tokens = tokens;
   int tokens_counter = 0;
   int current_index = 0;
   int continue_loop = 1;
@@ -295,15 +294,11 @@ void try_parse_percents_to_text(FormattedToken_t *token) {
 }
 
 void fill_text_token_value(FormattedToken_t *token) {
-  FormattedToken_t *current_token = NULL;
   FormatStringData_t *format_data = NULL;
   FormatStringData_t *value_data = NULL;
-  char *format_string = NULL;
   int begin_index = 0;
   int current_size = 0;
 
-  current_token = token;
-  format_string = token->format_string;
   format_data = &token->token_format_string_data;
   begin_index = format_data->data_start_index;
   current_size = format_data->data_length;
@@ -496,13 +491,11 @@ int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
 
   SpecFormat_t *current_spec = NULL;
   int spec = 0;
-  int continue_parsing = 1;
   int result = 0;
-  int format_length = 0;
 
   current_spec = token_spec;
   spec = format_character;
-  // no_type, text, integer, real, string, single_character
+
   switch (spec) {
   case 'c':
     result = 1;
@@ -622,11 +615,40 @@ void check_token_type(FormattedToken_t *token) {
 
   if (result_length != control_length)
     current_token->token_type = text;
-
-  // result_length++;
 }
 
-//
+int get_count_of_spec_tokens(FormattedToken_t *tokens, int tokens_count) {
+  int result = 0;
+
+  for (int i = 0; i < tokens_count; i++)
+    if (tokens[i].token_type != text && tokens[i].token_type != no_type)
+      result++;
+
+  return result;
+}
+
+//вот с утра
+void print_format_string_in_buffer(char *buffer_for_printing,
+                                   FormattedToken_t *tokens,
+                                   int spec_tokens_count) {
+
+  printf("spec tokens count is %d\n\n",spec_tokens_count);
+  //  va_list arg=NULL;
+  //  int va_args_count = 0;            // указатель на параметр
+
+  //   va_start(arg, count);   // получение адреса первого вариадического
+  //   параметра
+
+  //   for(int i=0; i < count; ++i) {
+  //               s += va_arg(arg, long);  // получение значение вариадического
+  //               параметра
+  //                                       // и переход к следующему параметру
+  //   }
+
+  //   va_end(arg);               // завершение процедуры перебора вариадических
+  //   параметров
+}
+
 void print_generated_tokens(FormattedToken_t *tokens, const char *format,
                             int tokens_count) {
   char *format_string = NULL;
@@ -700,23 +722,6 @@ void print_generated_tokens(FormattedToken_t *tokens, const char *format,
            tokens[j].token_flags.sharp, tokens[j].token_flags.zero);
 
     printf("\t\tflags_length = %d\n", tokens[j].token_flags.flags_length);
-
-    // typedef struct token_accuracy_or_width {
-    //   AccuracyOrWidthType_t value_type;
-    //   FormatStringData_t accuracy_or_width_data;
-    // } TokenAccuracyOrWidth_t;
-
-    // typedef struct format_string_data{
-    //   int data_start_index;
-    //   int data_length;
-    // }FormatStringData_t;
-
-    // typedef enum accuracy_or_width_type {
-    //   no_width_or_accuracy,
-    //   number,
-    //   star = '*'//,
-    //   //not_width_or_accuracy
-    // } AccuracyOrWidthType_t;
 
     printf("\tToken width: ");
     if (tokens[j].token_width.value_type == no_width_or_accuracy)
