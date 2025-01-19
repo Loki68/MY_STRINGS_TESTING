@@ -7,8 +7,8 @@ CLIBS = -L$(LIBRARY) -l:s21_string.a -lm
 #CLIBS = -lm
 TEST_LIB = 
 
-SOURCE = main.c s__sprintf.c s__string_helpers.c s__dynamic_memory_helpers.c s__converters_to_strings.c s__converters_from_strings.c
-OBJECTS = main.o s__sprintf.o s__string_helpers.o s__dynamic_memory_helpers.o s__converters_to_strings.o s__converters_from_strings.o
+SOURCE = main.c s__sprintf.c s__string_to_token_parsers.c s__dynamic_memory_helpers.c s__token_value_printers.c s__converters_to_strings.c s__token_initializers.c s__converters_from_strings.c
+OBJECTS = main.o s__sprintf.o s__string_to_token_parsers.o s__dynamic_memory_helpers.o s__token_value_printers.o s__converters_to_strings.o s__token_initializers.o s__converters_from_strings.o
 
 # SOURCE = s21_sprintf.c s21_string_helpers.c s21_dynamic_memory_helpers.c
 # OBJECTS = s21_sprintf.o s21_string_helpers.o s21_dynamic_memory_helpers.o
@@ -25,7 +25,7 @@ OBJECTS = main.o s__sprintf.o s__string_helpers.o s__dynamic_memory_helpers.o s_
 #all : clean format build_program
 all : clean build_program 
 
-build_program : main s__dynamic_memory_helpers s__string_helpers s__sprintf s__converters_to_strings s__converters_from_strings
+build_program : main s__dynamic_memory_helpers s__string_to_token_parsers s__sprintf s__token_value_printers s__token_initializers s__converters_to_strings s__converters_from_strings
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(PROGRAM) $(CLIBS) 
 
 main :
@@ -40,8 +40,8 @@ main :
 s__sprintf :
 	$(CC) $(CFLAGS) -c s__sprintf.c -o s__sprintf.o
 
-s__string_helpers :
-	$(CC) $(CFLAGS) -c s__string_helpers.c -o s__string_helpers.o
+s__string_to_token_parsers :
+	$(CC) $(CFLAGS) -c s__string_to_token_parsers.c -o s__string_to_token_parsers.o
 
 s__dynamic_memory_helpers :
 	$(CC) $(CFLAGS) -c s__dynamic_memory_helpers.c -o s__dynamic_memory_helpers.o
@@ -51,6 +51,12 @@ s__converters_to_strings :
 
 s__converters_from_strings :
 	$(CC) $(CFLAGS) -c s__converters_from_strings.c -o s__converters_from_strings.o
+
+s__token_initializers :
+	$(CC) $(CFLAGS) -c s__token_initializers.c -o s__token_initializers.o
+
+s__token_value_printers :
+	$(CC) $(CFLAGS) -c s__token_value_printers.c -o s__token_value_printers.o
 
 copy_lib : 
 	mkdir ../libs

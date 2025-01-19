@@ -14,12 +14,12 @@ void print_format_string_in_buffer(char *buffer_for_printing,
 
     if(token->token_width.value_type==star){
       value=va_arg(*argument,unsigned long);
-      printf("\nwidth value : %ld\n",value);
+      //printf("\nwidth value : %ld\n",value);
       token->token_width.long_value=value;}
 
     if(token->token_accuracy.value_type==star){
       value=va_arg(*argument,unsigned long);
-      printf("\naccuracy value : %ld\n",value);
+      //printf("\naccuracy value : %ld\n",value);
       token->token_accuracy.long_value=value;}
 
     switch (token->token_type) {
@@ -62,13 +62,15 @@ void print_format_string_in_buffer(char *buffer_for_printing,
 
 int s__sprintf(char *str, const char *format, ...) {
 
-  FormattedToken_t *tokens = NULL;
+  //FormattedToken_t *tokens = NULL;
+  //FormattedToken_t *tokens = NULL;
   //char *buffer_for_printing = NULL;
 
   // s21_size_t tokens_metrics_size = 0;
   //считаем точное число токенов, стобы выделить память под массив токенов
   int tokens_count = 0;
   int spec_tokens_count = 0;
+  int variadic_arguments_count=0;
 
   va_list arguments;
 
@@ -79,9 +81,10 @@ int s__sprintf(char *str, const char *format, ...) {
   if (format)
     tokens_count = get_percent_count(format);
 
-  tokens = FormattedToken_t_create_array(tokens_count);
+  FormattedToken_t tokens[tokens_count];
+  //tokens = FormattedToken_t_create_array(tokens_count);
 
-  if (tokens) {
+  if (tokens_count) {
     parse_string(format, tokens_count, tokens);
 
     parse_format_of_tokens(tokens, tokens_count);
@@ -90,8 +93,10 @@ int s__sprintf(char *str, const char *format, ...) {
 
     spec_tokens_count = get_count_of_spec_tokens(tokens, tokens_count);
 
-    print_generated_tokens(tokens, format, tokens_count);
-    
+    //print_generated_tokens(tokens, format, tokens_count);
+    //это не то, va_args_count нужно считать отдельно, 
+    //потому что точность и ширина тоже могут быть вариадическими
+    //get_variadic_arguments_count(tokens);
     if(spec_tokens_count)
       va_start(arguments,spec_tokens_count);
 
@@ -107,8 +112,11 @@ int s__sprintf(char *str, const char *format, ...) {
     if(arguments)
       va_end(arguments);
 
-    FormattedToken_t_delete_array(tokens);
-    tokens = NULL;
+    print_generated_tokens(tokens, format, tokens_count);
+
+
+    // FormattedToken_t_delete_array(tokens);
+    // tokens = NULL;
   }
 
   return 0;

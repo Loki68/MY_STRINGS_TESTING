@@ -27,8 +27,8 @@ int main(void) {
   sprintf(s_buff,src,0,5,stringa);
   s__sprintf(buff,src,0,5,stringa);
 
-printf("source string : %s\n",src);
-  printf("result : \n%s\nlength = %ld\nsprintf_result : \n\"%s\"\nlength = %ld\n",buff,s21_strlen(buff),s_buff,strlen(s_buff));
+printf("source string : %s\n\n",src);
+  printf("result : \n%s\nlength = %ld\n\nsprintf_result : \n\"%s\"\nlength = %ld\n",buff,s21_strlen(buff),s_buff,strlen(s_buff));
 
 // sprintf(buff_1,"\"%-10.4s\"\n",src);
 // printf("%s",buff_1);
