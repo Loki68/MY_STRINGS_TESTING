@@ -1,12 +1,15 @@
-#ifndef S21_STRING_HELPERS_H_INCLUDED
-#define S21_STRING_HELPERS_H_INCLUDED
+#ifndef S__STRING_HELPERS_H_INCLUDED
+#define S__STRING_HELPERS_H_INCLUDED
 
-//#include "../libs/s21_string.h" //заменить на реализации нужных функций
-#include "s21_dynamic_memory_helpers.h"
+#include "s__dynamic_memory_helpers.h"
 
 #include <stdarg.h> //собсно вариадика
 
 #include <stdio.h> //похже удалить!!11111
+
+
+#define ZERO_ACCURACY 0
+#define NEG_ACCURACY 6
 
 typedef enum parsing_state {
   parsing_text,
@@ -47,7 +50,8 @@ void parse_to_length(LengthFormat_t *token_length, char *format_string,
 int parse_to_spec(SpecFormat_t *token_spec, TokenType_t *token_type,
                   char format_character, int current_start_index);
 //
-void set_token_spec_and_set_result(SpecFormat_t *token_spec, int *result, TokenType_t token_type,int index);
+void set_token_spec_and_set_result(SpecFormat_t *token_spec, int *result,
+                                   SpecType_t spec_type, int index);
 //
 void check_token_type(FormattedToken_t *token);
 // correct
@@ -56,13 +60,25 @@ int get_percent_count(const char *format_string);
 void parse_string(const char *format_string, int tokens_length,
                   FormattedToken_t *tokens);
 
-int correct_initialized_tokens_count(FormattedToken_t *tokens, int tokens_count);
+int correct_initialized_tokens_count(FormattedToken_t *tokens,
+                                     int tokens_count);
 int get_count_of_spec_tokens(FormattedToken_t *tokens, int tokens_count);
 
-void print_text_in_buffer(FormattedToken_t *token,char* buffer_for_printing);
-void print_integer_in_buffer(FormattedToken_t *token,char* buffer_for_printing);
-void print_real_in_buffer(FormattedToken_t *token,char* buffer_for_printing);
-void print_string_in_buffer(FormattedToken_t *token,char* buffer_for_printing);
-void print_single_character_in_buffer(FormattedToken_t *token,char* buffer_for_printing);
+void print_text_in_buffer(FormattedToken_t *token, char *buffer_for_printing);
+void print_integer_in_buffer(FormattedToken_t *token,
+                             char *buffer_for_printing);
+void print_real_in_buffer(FormattedToken_t *token, char *buffer_for_printing);
+void print_string_in_buffer(FormattedToken_t *token, char *buffer_for_printing);
+void print_single_character_in_buffer(FormattedToken_t *token,
+                                      char *buffer_for_printing);
+//
+long long convert_string_to_long_long(const char* string);
+//
+char *build_specified_substring();
+//
+void reverse_value_string(char *value_string, int value_string_length);
+char *integer_by_base_to_string(long integer, char *buffer, int base);
+char *integer_to_string(long integer, char *buffer, int accuracy);
+char *real_to_string(double real, char *buffer, int accuracy);
 
 #endif

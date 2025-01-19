@@ -73,6 +73,7 @@ typedef struct length_format {
 typedef struct token_accuracy_or_width {
   AccuracyOrWidthType_t value_type;
   FormatStringData_t accuracy_or_width_data;
+  unsigned long long_value;
 } TokenAccuracyOrWidth_t;
 
 typedef struct spec_format {
@@ -89,6 +90,7 @@ typedef struct formatted_token {
   LengthFormat_t token_length;
   SpecFormat_t token_spec;
   char *format_string;
+  void *variadic_argument;//обработать инициализацию
   TokenType_t token_type;
   int is_initialized;
 } FormattedToken_t;
